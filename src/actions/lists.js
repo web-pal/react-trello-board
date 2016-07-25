@@ -35,8 +35,28 @@ export function getLists(quantity) {
 }
 
 
+function move(arr, old, newIndex) {
+  if (newIndex >= arr.length) {
+    let k = newIndex - arr.length;
+    while ((k--) + 1) {
+      arr.push(undefined);
+    }
+  }
+  arr.splice(newIndex, 0, arr.splice(old, 1)[0]);
+  return arr;
+}
+
+
 export function moveCard(x, y, xNew, yNew) {
   return (dispatch, getState) => {
-    console.log(getState);
+    const lists = getState().lists.lists;
+    if (x === xNew) {
+      lists[x].cards = move(lists[x].cards, y, yNew);
+    }//  else if (x !== xNew) {
+    //   lists[x] = lists[x].splice(y, 1);
+    //   // lists[y]
+    // }
+    dispatch({ type: GET_LISTS, lists, isFetching: true });
+    // console.log(state.lists.lists);
   };
-};
+}

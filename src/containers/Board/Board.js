@@ -20,9 +20,6 @@ class Board extends Component {
   constructor(props) {
     super(props);
     this.moveCard = this.moveCard.bind(this);
-    this.state = {
-      lists: props.lists
-    };
   }
 
   componentWillMount() {

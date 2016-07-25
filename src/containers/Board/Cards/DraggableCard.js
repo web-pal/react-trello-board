@@ -67,10 +67,8 @@ const cardTarget = {
     const dragIndexX = monitor.getItem().x;
     const dragIndexY = monitor.getItem().y;
 
-
     const hoverIndexX = props.x;
     const hoverIndexY = props.y;
-
 
     if (dragIndexX === hoverIndexX && dragIndexY === hoverIndexY) {
       return;

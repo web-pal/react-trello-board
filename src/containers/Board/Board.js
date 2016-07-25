@@ -17,7 +17,7 @@ const propTypes = {
 
 class Board extends Component {
   componentWillMount() {
-    this.props.getLists(15);
+    this.props.getLists(3);
   }
 
   render() {

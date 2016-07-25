@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { DropTarget as dropTarget } from 'react-dnd';
+import { DragSource as dragSource } from 'react-dnd';
 
 import Card from './DraggableCard';
 
@@ -12,8 +13,6 @@ const propTypes = {
 
 class Cards extends Component {
   render() {
-    console.log(this.props);
-
     return this.props.connectDropTarget(
       <div className="desk-items">
         {this.props.cards.map((item) =>

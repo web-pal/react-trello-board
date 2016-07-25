@@ -8,9 +8,9 @@ const layerStyles = {
   pointerEvents: 'none',
   zIndex: 100000,
   left: 0,
-  top: 0,
-  width: '100%',
-  height: '100%'
+  top: 0// ,
+  // width: '100%',
+  // height: '100%'
 };
 
 function getItemStyles(props) {
@@ -58,7 +58,7 @@ class CustomDragLayer extends Component {
     switch (type) {
       case 'card':
         return (
-          <CardDragPreview card={item.item} />
+          <CardDragPreview card={item} />
         );
       default:
         return null;

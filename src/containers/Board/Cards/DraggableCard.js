@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { DragSource as source } from 'react-dnd';
+import { DragSource as dragSource } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import Card from './Card';
 
@@ -7,15 +7,14 @@ import Card from './Card';
 const propTypes = {
   item: PropTypes.object,
   connectDragSource: PropTypes.func.isRequired,
-  connectDragPreview: PropTypes.func.isRequired
+  connectDragPreview: PropTypes.func.isRequired,
+  isDragging: PropTypes.bool.isRequired
 };
 
 
-function getStyles(props) {
-  const { isDragging } = props;
-
+function getStyles(isDragging) {
   return {
-    opacity: isDragging ? 0 : 1
+    opacity: isDragging ? 0.5 : 1
   };
 }
 
@@ -27,25 +26,35 @@ class CardComponent extends Component {
   }
 
   render() {
-    return this.props.connectDragSource(
+    const { isDragging, connectDragSource, item } = this.props;
+    return connectDragSource(
       <div>
-        <Card style={getStyles(this.props)} item={this.props.item} />
+        <div ref="card-dom-component">
+          <Card style={getStyles(isDragging)} item={item} />
+        </div>
       </div>
     );
   }
 }
 
-
 CardComponent.propTypes = propTypes;
 
 const cardSource = {
-  beginDrag(props) {
-    const { id, title, left, top, item } = props;
-    return { id, title, left, top, item };
+  beginDrag(props, monitor, component) {
+    const item = props.item;
+    const { id, title, left, top } = item;
+    const { clientWidth, clientHeight } = component.refs['card-dom-component'];
+    return { id, title, left, top, item, clientWidth, clientHeight };
+  },
+  endDrag(props, monitor, component) {
+    // TODO save item to board after end druging
+  },
+  isDragging(props, monitor) {
+    return props.item.id === monitor.getItem().id;
   }
 };
 
-function collect(connect, monitor) {
+function collectDragSource(connect, monitor) {
   return {
     connectDragSource: connect.dragSource(),
     connectDragPreview: connect.dragPreview(),
@@ -53,4 +62,4 @@ function collect(connect, monitor) {
   };
 }
 
-export default source('card', cardSource, collect)(CardComponent);
+export default dragSource('card', cardSource, collectDragSource)(CardComponent);

@@ -9,7 +9,7 @@ const galPng = require('../../../assets/images/gal.png');
 const delPng = require('../../../assets/images/del.png');
 
 const Card = (props) => (
-  <div className="item">
+  <div style={props.style} className="item">
     <div className="item-name">{props.item.title}</div>
     <div className="item-container">
       <div className="item-avatar-wrap"><img src={bJpg} alt="" /></div>

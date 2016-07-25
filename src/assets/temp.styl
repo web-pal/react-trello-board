@@ -1,0 +1,121 @@
+*
+	box-sizing border-box
+.clearfix
+	clearfix()
+html
+	position relative
+	height 100%
+body
+	font 14px "Helvetica Neue", Arial, Helvetica, sans-serif
+	line-height 18px
+	color #4d4d4d
+	font-weight normal
+	padding 0 10px
+	background-color rgb(0, 121, 191)
+	position relative
+	height 100%
+	padding 0
+	margin 0
+	clearfix()
+*
+	box-sizing border-box
+a
+	text-decoration none
+img
+	max-width 100%
+
+main
+	padding 50px 10px
+	overflow-x auto
+	overflow-y hidden
+	height 100%
+	white-space nowrap
+	clearfix()
+.desk
+	width 270px
+	display inline-block
+	height 100%
+	overflow hidden
+	min-height 100px
+	background-color #e2e4e6
+	box-shadow 1px 1px 1px rgba(0,0,0,.5)
+	border-radius 3px
+	padding-bottom 20px
+	margin-right 20px
+	.desk-head
+		position relative
+		padding 5px 8px
+		margin-bottom 10px
+		clearfix()
+		.desk-name
+			font-weight bold
+			white-space normal
+			width 100%
+.desk-items
+	overflow-y auto
+	height 100%
+	padding-bottom 20px
+.item
+	width 90%
+	margin 0 auto 10px
+	background #fff
+	min-height 100px
+	border-radius 5px
+	box-shadow 1px 1px 1px rgba(0,0,0,.3)
+	transition 0.15s
+	cursor pointer
+	&:hover
+		background #f7f7f7
+	.item-name
+		padding 5px 10px
+		border-bottom 1px solid #dbdbdb
+		white-space normal
+		word-break break-all
+		word-wrap break-world
+	.item-container
+		padding 10px
+		border-bottom 1px solid #dbdbdb
+		clearfix()
+		.item-avatar-wrap
+			width 70px
+			float left
+			margin-bottom 5px
+			img
+				width 50px
+				height 50px
+				display block
+				margin 0 auto
+				border-radius 50%
+				border 1px solid #dbdbdb
+		.item-content
+			white-space normal
+			.item-author
+				font-size 16px
+				font-weight bolder
+			p
+				margin 5px 0
+	.item-perfomers
+		clearfix()
+		padding 5px 10px
+		.add-perfomers
+			float left
+		.delete-perfomers
+			float right
+		.add-perfomers,
+		.delete-perfomers
+			a
+				display block
+				float left
+				margin-right 3px
+				img
+					width 15px
+					height 15px
+			.perfomer
+				float left
+				img
+					display block
+					width 15px
+					height 15px
+					border-radius 50%
+
+

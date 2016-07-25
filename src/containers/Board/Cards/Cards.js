@@ -7,7 +7,9 @@ import Card from './DraggableCard';
 
 const propTypes = {
   cards: PropTypes.array.isRequired,
-  connectDropTarget: PropTypes.func.isRequired
+  connectDropTarget: PropTypes.func.isRequired,
+  x: PropTypes.number.isRequired,
+  moveCard: PropTypes.func.isRequired
 };
 
 
@@ -15,8 +17,8 @@ class Cards extends Component {
   render() {
     return this.props.connectDropTarget(
       <div className="desk-items">
-        {this.props.cards.map((item) =>
-          <Card item={item} key={item.id} />
+        {this.props.cards.map((item, i) =>
+          <Card moveCard={this.props.moveCard} x={this.props.x} y={i} item={item} key={item.id} />
         )}
       </div>
     );

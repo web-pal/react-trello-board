@@ -33,3 +33,10 @@ export function getLists(quantity) {
     dispatch({ type: GET_LISTS_START, isFetching: false });
   };
 }
+
+
+export function moveCard(x, y, xNew, yNew) {
+  return (dispatch, getState) => {
+    console.log(getState);
+  };
+};

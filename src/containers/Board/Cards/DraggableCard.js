@@ -74,17 +74,17 @@ const cardTarget = {
       return;
     }
 
-    const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
-    const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-    const clientOffset = monitor.getClientOffset();
-    const hoverClientY = clientOffset.y - hoverBoundingRect.top;
+    // const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
+    // const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+    // const clientOffset = monitor.getClientOffset();
+    // const hoverClientY = clientOffset.y - hoverBoundingRect.top;
 
-    if (dragIndexX < hoverIndexX && hoverClientY < hoverMiddleY) {
-      return;
-    }
-    if (dragIndexX > hoverIndexX && hoverClientY > hoverMiddleY) {
-      return;
-    }
+    // if (dragIndexX < hoverIndexX && hoverClientY < hoverMiddleY) {
+    //   return;
+    // }
+    // if (dragIndexX > hoverIndexX && hoverClientY > hoverMiddleY) {
+    //   return;
+    // }
 
     props.moveCard(dragIndexX, dragIndexY, hoverIndexX, hoverIndexY);
 

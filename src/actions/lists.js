@@ -50,12 +50,14 @@ function move(arr, old, newIndex) {
 export function moveCard(x, y, xNew, yNew) {
   return (dispatch, getState) => {
     const lists = getState().lists.lists;
+    console.log(lists);
     if (x === xNew) {
       lists[x].cards = move(lists[x].cards, y, yNew);
-    }//  else if (x !== xNew) {
-    //   lists[x] = lists[x].splice(y, 1);
-    //   // lists[y]
-    // }
+    } else if (x !== xNew) {
+      const item = lists[x].cards[y];
+      lists[x].cards = lists[x].cards.splice(y, 1);
+      lists[xNew].cards = lists[xNew].cards.splice(yNew, 0, item);
+    }
     dispatch({ type: GET_LISTS, lists, isFetching: true });
     // console.log(state.lists.lists);
   };

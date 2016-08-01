@@ -57,6 +57,9 @@ class CustomDragLayer extends Component {
   renderItem(type, item) {
     switch (type) {
       case 'card':
+        // return (
+        //   <div style="width: 230px; height: 50px; background: #CCC"></div>
+        // );
         return (
           <CardDragPreview card={item} />
         );

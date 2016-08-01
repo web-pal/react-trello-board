@@ -52,15 +52,27 @@ const cardSource = {
     // try use getBoundingClientRect
     return { id, title, left, top, item, x, y, clientWidth, clientHeight };
   },
-  endDrag(props, monitor, component) {
-    // TODO save item to board after end druging
-  },
   isDragging(props, monitor) {
     return props.item.id === monitor.getItem().id;
   }
 };
 
 const cardTarget = {
+  drop(props, monitor, component) {
+    // TODO save item to board after end druging
+    const draggedId = monitor.getItem().id;
+
+    const dragIndexX = monitor.getItem().x;
+    const dragIndexY = monitor.getItem().y;
+
+    const hoverIndexX = props.x;
+    const hoverIndexY = props.y;
+
+    if (dragIndexX === hoverIndexX && dragIndexY === hoverIndexY) {
+      return;
+    }
+    props.moveCard(dragIndexX, dragIndexY, hoverIndexX, hoverIndexY);
+  },
   hover(props, monitor, component) {
     const draggedId = monitor.getItem().id;
 
@@ -74,6 +86,8 @@ const cardTarget = {
       return;
     }
 
+    // console.log(monitor.isOver({ shallow: true }));
+
     // const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
     // const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
     // const clientOffset = monitor.getClientOffset();
@@ -85,15 +99,16 @@ const cardTarget = {
     // if (dragIndexX > hoverIndexX && hoverClientY > hoverMiddleY) {
     //   return;
     // }
-
-    props.moveCard(dragIndexX, dragIndexY, hoverIndexX, hoverIndexY);
-
-    if (draggedId !== props.id) {
-      // TODO make flux move actions
-      // console.log('should be moved');
-      // props.moveCard(draggedId, props.id);
-    }
+    // if (draggedId !== props.id) {
+    //   // TODO make flux move actions
+    //   // console.log('should be moved');
+    //   props.moveCard(dragIndexX, dragIndexY, hoverIndexX, hoverIndexY);
+    // }
   }
+  // canDrop(props, monitor) {
+  //   console.log('her');
+  //   return true;
+  // }
 };
 
 function collectDragSource(connect, monitor) {

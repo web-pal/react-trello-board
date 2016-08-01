@@ -61,30 +61,27 @@ const cardTarget = {
   drop(props, monitor, component) {
     // TODO save item to board after end druging
     const draggedId = monitor.getItem().id;
-
     const dragIndexX = monitor.getItem().x;
     const dragIndexY = monitor.getItem().y;
-
     const hoverIndexX = props.x;
     const hoverIndexY = props.y;
-
     if (dragIndexX === hoverIndexX && dragIndexY === hoverIndexY) {
       return;
     }
     props.moveCard(dragIndexX, dragIndexY, hoverIndexX, hoverIndexY);
   },
   hover(props, monitor, component) {
-    const draggedId = monitor.getItem().id;
+    // const draggedId = monitor.getItem().id;
 
-    const dragIndexX = monitor.getItem().x;
-    const dragIndexY = monitor.getItem().y;
+    // const dragIndexX = monitor.getItem().x;
+    // const dragIndexY = monitor.getItem().y;
 
-    const hoverIndexX = props.x;
-    const hoverIndexY = props.y;
+    // const hoverIndexX = props.x;
+    // const hoverIndexY = props.y;
 
-    if (dragIndexX === hoverIndexX && dragIndexY === hoverIndexY) {
-      return;
-    }
+    // if (dragIndexX === hoverIndexX && dragIndexY === hoverIndexY) {
+    //   return;
+    // }
 
     // console.log(monitor.isOver({ shallow: true }));
 
@@ -106,10 +103,24 @@ const cardTarget = {
     // }
   }
   // canDrop(props, monitor) {
-  //   console.log('her');
+  //   //console.log(monitor.canDrop());
   //   return true;
   // }
 };
+
+// options: 4rd param to dragSource https://gaearon.github.io/react-dnd/docs-drag-source.html
+const OPTIONS = {
+  arePropsEqual: function arePropsEqual(props, otherProps) {
+    let isEqual = true;
+    if (props.item.id === otherProps.item.id) {
+      isEqual = true;
+    } else {
+      isEqual = false;
+    }
+    return isEqual;
+  }
+};
+
 
 function collectDragSource(connect, monitor) {
   return {
@@ -123,5 +134,5 @@ export default flow(
   dropTarget('card', cardTarget, connect => ({
     connectDropTarget: connect.dropTarget()
   })),
-  dragSource('card', cardSource, collectDragSource)
+  dragSource('card', cardSource, collectDragSource, OPTIONS)
 )(CardComponent);

@@ -50,6 +50,7 @@ function move(arr, old, newIndex) {
 export function moveCard(x, y, xNew, yNew) {
   return (dispatch, getState) => {
     const lists = getState().lists.lists;
+    console.log('herhehr');
     if (x === xNew) {
       lists[x].cards = move(lists[x].cards, y, yNew);
     } else if (x !== xNew) {

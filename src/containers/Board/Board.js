@@ -23,21 +23,10 @@ class Board extends Component {
   }
 
   componentWillMount() {
-    this.props.getLists(3);
+    this.props.getLists(15);
   }
 
   moveCard(dragIndexX, dragIndexY, hoverIndexX, hoverIndexY) {
-    // const { cards } = this.state;
-    // const dragCard = cards[dragIndex];
-
-    // this.setState(update(this.state, {
-    //   cards: {
-    //     $splice: [
-    //       [dragIndex, 1],
-    //       [hoverIndex, 0, dragCard]
-    //     ]
-    //   }
-    // }));
     this.props.moveCard(dragIndexX, dragIndexY, hoverIndexX, hoverIndexY);
   }
 

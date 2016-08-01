@@ -131,8 +131,9 @@ function collectDragSource(connect, monitor) {
 }
 
 export default flow(
-  dropTarget('card', cardTarget, connect => ({
-    connectDropTarget: connect.dropTarget()
+  dropTarget('card', cardTarget, (connect, monitor) => ({
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver()
   })),
   dragSource('card', cardSource, collectDragSource, OPTIONS)
 )(CardComponent);

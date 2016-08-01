@@ -15,6 +15,7 @@ const propTypes = {
 
 class Cards extends Component {
   render() {
+
     return this.props.connectDropTarget(
       <div className="desk-items">
         {this.props.cards.map((item, i) =>

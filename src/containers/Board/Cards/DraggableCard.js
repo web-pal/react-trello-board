@@ -11,7 +11,7 @@ const propTypes = {
   item: PropTypes.object,
   connectDragSource: PropTypes.func.isRequired,
   connectDragPreview: PropTypes.func.isRequired,
-  connectDropTarget: PropTypes.func.isRequired,
+  // connectDropTarget: PropTypes.func.isRequired,
   isDragging: PropTypes.bool.isRequired,
   x: PropTypes.number.isRequired,
   y: PropTypes.number.isRequired,
@@ -21,7 +21,7 @@ const propTypes = {
 
 function getStyles(isDragging) {
   return {
-    opacity: isDragging ? 0.5 : 1
+    display: isDragging ? 0.5 : 1
   };
 }
 
@@ -33,12 +33,12 @@ class CardComponent extends Component {
   }
 
   render() {
-    const { isDragging, connectDragSource, item, connectDropTarget } = this.props;
-    return connectDragSource(connectDropTarget(
+    const { isDragging, connectDragSource, item } = this.props;
+    return connectDragSource(
       <div>
         <Card style={getStyles(isDragging)} item={item} />
       </div>
-    ));
+    );
   }
 }
 
@@ -53,7 +53,8 @@ const cardSource = {
     return { id, title, left, top, item, x, y, clientWidth, clientHeight };
   },
   isDragging(props, monitor) {
-    return props.item.id === monitor.getItem().id;
+    const isDragging = props.item && props.item.id === monitor.getItem().id;
+    return isDragging;
   }
 };
 
@@ -130,10 +131,12 @@ function collectDragSource(connect, monitor) {
   };
 }
 
-export default flow(
-  dropTarget('card', cardTarget, (connect, monitor) => ({
+
+function collectDropTarget(connect, monitor, component) {
+  return {
     connectDropTarget: connect.dropTarget(),
     isOver: monitor.isOver()
-  })),
-  dragSource('card', cardSource, collectDragSource, OPTIONS)
-)(CardComponent);
+  };
+}
+
+export default dragSource('card', cardSource, collectDragSource, OPTIONS)(CardComponent);

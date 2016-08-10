@@ -2,8 +2,7 @@ import React, { PropTypes } from 'react';
 
 const propTypes = {
   item: PropTypes.object.isRequired,
-  style: PropTypes.object,
-  isDragging: PropTypes.bool
+  style: PropTypes.object
 };
 
 const bJpg = require('../../../assets/images/b.jpg');
@@ -11,15 +10,15 @@ const galPng = require('../../../assets/images/gal.png');
 const delPng = require('../../../assets/images/del.png');
 
 const Card = (props) => {
-  const { style, item } = props;
+  console.log(props);
 
   return (
-    <div style={style} className="item" id={style ? item.id : null}>
-      <div className="item-name">{item.title}</div>
+    <div style={props.toHide && {display: 'none'}} className="item">
+      <div className="item-name">{props.item.title}</div>
       <div className="item-container">
         <div className="item-avatar-wrap"><img src={bJpg} alt="" /></div>
         <div className="item-content">
-          <div className="item-author">{`${item.firstName} ${item.lastName}`}</div>
+          <div className="item-author">{`${props.item.firstName} ${props.item.lastName}`}</div>
           <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Libero, banditos.</p>
         </div>
       </div>

@@ -17,8 +17,8 @@ const middleware = [
 function configureStore(initialState) {
   const store = createStore(rootReducer, initialState, compose(
     applyMiddleware(...middleware),
-    )
-  );
+    window.devToolsExtension ? window.devToolsExtension() : f => f
+  ));
 
   if (module.hot) {
     // Enable Webpack hot module replacement for reducers

@@ -15,7 +15,8 @@ const propTypes = {
   isDragging: PropTypes.bool.isRequired,
   x: PropTypes.number.isRequired,
   y: PropTypes.number.isRequired,
-  moveCard: PropTypes.func.isRequired
+  moveCard: PropTypes.func.isRequired,
+  dragItem: PropTypes.object
 };
 
 
@@ -33,10 +34,11 @@ class CardComponent extends Component {
   }
 
   render() {
-    const { isDragging, connectDragSource, item } = this.props;
+    const { isDragging, connectDragSource, item, dragItem } = this.props;
+
     return connectDragSource(
       <div>
-        <Card style={getStyles(isDragging)} item={item} />
+        <Card style={getStyles(isDragging)} item={item} isDragging={isDragging} />
       </div>
     );
   }
@@ -84,7 +86,6 @@ const cardTarget = {
     //   return;
     // }
 
-    // console.log(monitor.isOver({ shallow: true }));
 
     // const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
     // const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
@@ -99,12 +100,10 @@ const cardTarget = {
     // }
     // if (draggedId !== props.id) {
     //   // TODO make flux move actions
-    //   // console.log('should be moved');
     //   props.moveCard(dragIndexX, dragIndexY, hoverIndexX, hoverIndexY);
     // }
   }
   // canDrop(props, monitor) {
-  //   //console.log(monitor.canDrop());
   //   return true;
   // }
 };

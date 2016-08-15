@@ -26,27 +26,6 @@ class Cards extends Component {
     }; // defined at specs object
   }
 
-  // getPlaceholderIndex(y) {
-  //   // this function should be rewritten, if height of the card will be dynamic
-  //   let placeholderIndex;
-
-  //   // t0d0: change cardHeight from const
-  //   const cardHeight = 161; // height of a single card(excluding marginBottom/paddingBottom)
-  //   const cardMargin = 10; // height of a marginBottom+paddingBottom
-
-  //   // t0d0: change offsetHeight from const
-  //   const offsetHeight = 84; // height offset from the top of the page
-
-  //   const yPos = y - offsetHeight; // we start counting from the top of dragTarget
-  //   if (yPos < cardHeight / 2) {
-  //     placeholderIndex = -1; // place at the start
-  //   } else {
-  //     placeholderIndex = Math.floor((yPos - cardHeight / 2) / (cardHeight + cardMargin));
-  //   }
-
-  //   return placeholderIndex;
-  // }
-
   render() {
     const { connectDropTarget, x, cards, isOver, canDrop } = this.props;
     const { placeholderIndex } = this.state;
@@ -137,12 +116,12 @@ function getPlaceholderIndex(y, scrollY) {
 
 const specs = {
   drop(props, monitor, component) {
+    component.setState({ isScrollingBottom: false, isScrollingTop: false });
     const { placeholderIndex } = component.state;
     const item = monitor.getItem();
     const lastX = monitor.getItem().x;
     const lastY = monitor.getItem().y;
     const nextX = props.x;
-    // const nextY = placeholderIndex === -1 ? 0 : placeholderIndex;
     const nextY = placeholderIndex + 1;
 
     document.getElementById(item.id).style.display = 'block';
@@ -161,12 +140,13 @@ const specs = {
       findDOMNode(component).scrollTop
     );
 
-    if (monitor.getClientOffset().y < 160) {
+    if (monitor.isOver() && monitor.getClientOffset().y < 188) {
       if (!isScrollingTop) {
         component.setState({ isScrollingTop: true });
+        const scrollingSpeed = 5;
 
         setTimeout(function scrollUp() {
-          findDOMNode(component).scrollTop -= 1;
+          findDOMNode(component).scrollTop -= scrollingSpeed;
           if (component.state.isScrollingTop) setTimeout(scrollUp, 10);
         }, 10);
       }
@@ -174,12 +154,13 @@ const specs = {
       component.setState({ isScrollingTop: false });
     }
 
-    if (monitor.getClientOffset().y > 620) {
+    if (monitor.isOver() && monitor.getClientOffset().y > 633) {
       if (!isScrollingBottom) {
         component.setState({ isScrollingBottom: true });
+        const scrollingSpeed = 5;
 
         setTimeout(function scrollDown() {
-          findDOMNode(component).scrollTop += 1;
+          findDOMNode(component).scrollTop += scrollingSpeed;
           if (component.state.isScrollingBottom) setTimeout(scrollDown, 10);
         }, 10);
       }
@@ -198,7 +179,6 @@ const specs = {
     document.getElementById(item.id).style.display = 'none';
 
     // const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
-    // console.log(hoverBoundingRect);
     // const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
     // const clientOffset = monitor.getClientOffset();
     // const hoverClientY = clientOffset.y - hoverBoundingRect.top;

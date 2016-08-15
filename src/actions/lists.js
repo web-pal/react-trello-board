@@ -3,6 +3,8 @@ import faker from 'faker';
 export const GET_LISTS_START = 'GET_LISTS_START';
 export const GET_LISTS = 'GET_LISTS';
 
+export const MOVE_CARD = 'MOVE_CARD';
+
 
 export function getLists(quantity) {
   return dispatch => {
@@ -12,7 +14,7 @@ export function getLists(quantity) {
       let count = 0;
       for (let i = 0; i < quantity; i++) {
         const cards = [];
-        const randomQuantity = Math.floor(Math.random() * (10 - 1 + 1)) + 1;
+        const randomQuantity = Math.floor(Math.random() * (6 - 1 + 1)) + 1;
         for (let ic = 0; ic < randomQuantity; ic++) {
           cards.push({
             id: count,
@@ -29,34 +31,13 @@ export function getLists(quantity) {
         });
       }
       dispatch({ type: GET_LISTS, lists, isFetching: true });
-    }, 1000); // Fake delay
+    }, 1000); // fake delay
     dispatch({ type: GET_LISTS_START, isFetching: false });
   };
 }
 
-
-function move(arr, old, newIndex) {
-  if (newIndex >= arr.length) {
-    let k = newIndex - arr.length;
-    while ((k--) + 1) {
-      arr.push(undefined);
-    }
-  }
-  arr.splice(newIndex, 0, arr.splice(old, 1)[0]);
-  return arr;
-}
-
-
-export function moveCard(x, y, xNew, yNew) {
-  return (dispatch, getState) => {
-    const lists = getState().lists.lists;
-    if (x === xNew) {
-      lists[x].cards = move(lists[x].cards, y, yNew);
-    } else if (x !== xNew) {
-      const item = lists[x].cards[y];
-      lists[x].cards.splice(y, 1);
-      lists[xNew].cards.splice(yNew, 0, item);
-    }
-    dispatch({ type: GET_LISTS, lists, isFetching: true });
+export function moveCard(lastX, lastY, nextX, nextY) {
+  return (dispatch) => {
+    dispatch({ type: MOVE_CARD, lastX, lastY, nextX, nextY });
   };
 }

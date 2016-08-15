@@ -1,16 +1,14 @@
 import React, { Component, PropTypes } from 'react';
+import { DragLayer } from 'react-dnd';
+
 import CardDragPreview from './CardDragPreview';
 import snapToGrid from './snapToGrid';
-import { DragLayer as dragLayer } from 'react-dnd';
+
 
 const layerStyles = {
   position: 'fixed',
   pointerEvents: 'none',
-  zIndex: 100000,
-  left: 0,
-  top: 0// ,
-  // width: '100%',
-  // height: '100%'
+  zIndex: 100000
 };
 
 function getItemStyles(props) {
@@ -57,9 +55,6 @@ class CustomDragLayer extends Component {
   renderItem(type, item) {
     switch (type) {
       case 'card':
-        // return (
-        //   <div style="width: 230px; height: 50px; background: #CCC"></div>
-        // );
         return (
           <CardDragPreview card={item} />
         );
@@ -97,4 +92,4 @@ function collect(monitor) {
   };
 }
 
-export default dragLayer(collect)(CustomDragLayer);
+export default DragLayer(collect)(CustomDragLayer);

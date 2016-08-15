@@ -1,103 +1,94 @@
 import React, { Component, PropTypes } from 'react';
-import { DropTarget as dropTarget } from 'react-dnd';
+import { DropTarget } from 'react-dnd';
+// import { findDOMNode } from 'react-dom';
 
 import Card from './DraggableCard';
 
 
 const propTypes = {
-  cards: PropTypes.array.isRequired,
   connectDropTarget: PropTypes.func.isRequired,
-  x: PropTypes.number.isRequired,
   moveCard: PropTypes.func.isRequired,
-  isOverCurrent: PropTypes.bool,
-  isOver: PropTypes.bool,
-  currentOffset: PropTypes.object,
-  item: PropTypes.object,
-  canDrop: PropTypes.bool
+  cards: PropTypes.array.isRequired, // list of cards
+  x: PropTypes.number.isRequired, // column number
+  isOver: PropTypes.bool, // is over current column?
+  item: PropTypes.object, // item that is being dragged
+  canDrop: PropTypes.bool // defines whether card is being dragged
 };
 
 
 class Cards extends Component {
   constructor(props) {
     super(props);
-    // look at specs object
     this.state = {
-      currentOffset: undefined,
-      dragItem: undefined
-    };
+      placeholderIndex: undefined
+    }; // defined at specs object
   }
 
-  getPlaceholderIndex(yPos, cardHeight, offsetHeight) {
-    // TODO change offsetHeight from const
-    // TODO change cardHeight from const
+  // getPlaceholderIndex(y) {
+  //   // this function should be rewritten, if height of the card will be dynamic
+  //   let placeholderIndex;
 
-    // yPos - Y coordinate of cursor
-    return Math.floor((yPos - offsetHeight) / cardHeight);
-  }
+  //   // t0d0: change cardHeight from const
+  //   const cardHeight = 161; // height of a single card(excluding marginBottom/paddingBottom)
+  //   const cardMargin = 10; // height of a marginBottom+paddingBottom
+
+  //   // t0d0: change offsetHeight from const
+  //   const offsetHeight = 84; // height offset from the top of the page
+
+  //   const yPos = y - offsetHeight; // we start counting from the top of dragTarget
+  //   if (yPos < cardHeight / 2) {
+  //     placeholderIndex = -1; // place at the start
+  //   } else {
+  //     placeholderIndex = Math.floor((yPos - cardHeight / 2) / (cardHeight + cardMargin));
+  //   }
+
+  //   return placeholderIndex;
+  // }
 
   render() {
-    const { isOver, moveCard, x, cards, connectDropTarget, canDrop } = this.props;
-    const { currentOffset, dragItem } = this.state;
+    const { connectDropTarget, x, cards, isOver, canDrop } = this.props;
+    const { placeholderIndex } = this.state;
 
-    const cardHeight = 171; // height of a single card(including marginBottom/paddingBottom)
-    const offsetHeight = 88; // height offset from the top of the page
-
-    // if (dragItem) {
-    //   const dragItemId = dragItem.id;
-    //   if (canDrop) {
-    //     document.getElementById(dragItemId).style.display = 'block';
-    //   } else {
-    //     document.getElementById(dragItemId).style.display = 'none';
-    //   }
-    // }
-
+    let toPlaceFirst;
     let toPlaceLast;
     let cardList = [];
     cards.forEach((item, i) => {
-      if (isOver && currentOffset) {
-        toPlaceLast = false;
-        // if is over current column and being dragged
-        // we check if placeholder index greater than lenght of the array with cards
-        // if it is greater, then we changer "toPlaceLast" to true and render placeholder
-        // as the last element in the column
-        // otherwise render it before element with placeholder_index
-        if (this.getPlaceholderIndex(currentOffset.y, cardHeight, offsetHeight) > i) {
-          toPlaceLast = true;
-        } else if (!toPlaceLast &&
-          this.getPlaceholderIndex(currentOffset.y, cardHeight, offsetHeight) === i
-        ) {
-          cardList.push(<div key="placeholder" className="item placeholder" />);
-        }
+      toPlaceFirst = false;
+      if (isOver && canDrop && i === 0 && placeholderIndex === -1) {
+        toPlaceFirst = true;
+        cardList.push(<div key="placeholder" className="item placeholder" />);
       }
-
-      // don't display element which is being dragged
-      // TODO
-      // TODO
-      // TODO
-      // const toHide = canDrop && (dragItem && dragItem.id === item.id);
-      // TODO
-      // TODO
-      // TODO
-
-      // check if item is available and if it should be displayed
       if (item !== undefined) {
         cardList.push(
-          <Card moveCard={moveCard}
-            x={x}
-            y={i} item={item}
+          <Card x={x} y={i}
+            item={item}
             key={item.id}
           />
         );
       }
-    });
 
-    // if there is no items in cards currently, display a placeholder anyway
-    if (isOver && currentOffset && cards.length === 0) {
-      cardList.push(<div key="placeholder" className="item placeholder" />);
-    }
+      if (isOver && canDrop) {
+        toPlaceLast = false;
+        // if is over current column and being dragged
+        // we check if PLACEHOLDER_INDEX is greater than lenght of the array with cards
+        // if it is greater, then we change "toPlaceLast" to true and..
+        // ..render placeholder as the last element in the column
+        // otherwise render it before element with PLACEHOLDER_INDEX
+        if (!toPlaceFirst && placeholderIndex > i) {
+          toPlaceLast = true;
+        } else if (!toPlaceFirst && !toPlaceLast && placeholderIndex === i) {
+          cardList.push(<div key="placeholder" className="item placeholder" />);
+        }
+      }
+    });
 
     // if placeholder index is greater than array.lenght, display placeholder as last
     if (toPlaceLast) {
+      cardList.push(<div key="placeholder" className="item placeholder" />);
+    }
+
+    // if there is no items in cards currently, display a placeholder anyway
+    if (isOver && canDrop && cards.length === 0) {
       cardList.push(<div key="placeholder" className="item placeholder" />);
     }
 
@@ -109,37 +100,61 @@ class Cards extends Component {
   }
 }
 
-
 Cards.propTypes = propTypes;
 
 function collect(connect, monitor) {
   return {
     connectDropTarget: connect.dropTarget(),
     isOver: monitor.isOver(),
-    isOverCurrent: monitor.isOver({ shallow: true }),
-    currentOffset: monitor.getSourceClientOffset(),
     canDrop: monitor.canDrop(),
-    itemType: monitor.getItemType(),
     item: monitor.getItem()
   };
 }
 
+function getPlaceholderIndex(y) {
+  let placeholderIndex;
+
+  // t0d0: change cardHeight from const
+  const cardHeight = 161; // height of a single card(excluding marginBottom/paddingBottom)
+  const cardMargin = 10; // height of a marginBottom+paddingBottom
+
+  // t0d0: change offsetHeight from const
+  const offsetHeight = 84; // height offset from the top of the page
+
+  // we start counting from the top of dragTarget
+  const yPos = y - offsetHeight;
+
+  if (yPos < cardHeight / 2) {
+    placeholderIndex = -1; // place at the start
+  } else {
+    placeholderIndex = Math.floor((yPos - cardHeight / 2) / (cardHeight + cardMargin));
+  }
+
+  return placeholderIndex;
+}
+
 const specs = {
-  drop(props, monitor) {
-    // TODO save item to board after end druging
-    // const draggedId = monitor.getItem().id;
+  drop(props, monitor, component) {
+    const { placeholderIndex } = component.state;
     const item = monitor.getItem();
-    const dragIndexX = monitor.getItem().x;
-    const dragIndexY = monitor.getItem().y;
-    const hoverIndexX = props.x;
-    const hoverIndexY = props.y;
-    if (dragIndexX === hoverIndexX && dragIndexY === hoverIndexY) {
+    const lastX = monitor.getItem().x;
+    const lastY = monitor.getItem().y;
+    const nextX = props.x;
+    // const nextY = placeholderIndex === -1 ? 0 : placeholderIndex;
+    const nextY = placeholderIndex + 1;
+
+    document.getElementById(item.id).style.display = 'block';
+
+    if (lastX === nextX && lastY === nextY) {
       return;
     }
-    document.getElementById(item.id).style.display = 'block';
-    props.moveCard(dragIndexX, dragIndexY, hoverIndexX, hoverIndexY);
+    console.log(placeholderIndex);
+
+    props.moveCard(lastX, lastY, nextX, nextY);
   },
   hover(props, monitor, component) {
+    const placeholderIndex = getPlaceholderIndex(monitor.getClientOffset().y);
+
     // IMPORTANT!
     // HACK! Since there is an open bug in react-dnd, making it impossible
     // to get the current client offset through the collect function as the
@@ -147,43 +162,27 @@ const specs = {
     // on the component from here outside the component.
     // https://github.com/gaearon/react-dnd/issues/179
     component.setState({
-      currentOffset: monitor.getSourceClientOffset(),
-      dragItem: monitor.getItem()
+      placeholderIndex
     });
     const item = monitor.getItem();
     document.getElementById(item.id).style.display = 'none';
-    // const draggedId = monitor.getItem().id;
-
-    // const dragIndexX = monitor.getItem().x;
-    // const dragIndexY = monitor.getItem().y;
-
-    // const hoverIndexX = props.x;
-    // const hoverIndexY = props.y;
-
-    // if (dragIndexX === hoverIndexX && dragIndexY === hoverIndexY) {
-    //   return;
-    // }
-
 
     // const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
+    // console.log(hoverBoundingRect);
     // const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
     // const clientOffset = monitor.getClientOffset();
     // const hoverClientY = clientOffset.y - hoverBoundingRect.top;
 
-    // if (dragIndexX < hoverIndexX && hoverClientY < hoverMiddleY) {
+    // if (lastX < hoverIndexX && hoverClientY < hoverMiddleY) {
     //   return;
     // }
-    // if (dragIndexX > hoverIndexX && hoverClientY > hoverMiddleY) {
+    // if (lastX > hoverIndexX && hoverClientY > hoverMiddleY) {
     //   return;
     // }
     // if (draggedId !== props.id) {
-    //   // TODO make flux move actions
-    //   props.moveCard(dragIndexX, dragIndexY, hoverIndexX, hoverIndexY);
+    //   props.moveCard(lastX, lastY, hoverIndexX, hoverIndexY);
     // }
   }
-  // canDrop(props, monitor) {
-  //   return true;
-  // }
 };
 
-export default dropTarget('card', specs, collect)(Cards);
+export default DropTarget('card', specs, collect)(Cards);

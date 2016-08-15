@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
-import { DragDropContext as dragContext } from 'react-dnd';
 
 import * as ListsActions from '../../actions/lists';
 
@@ -23,7 +23,7 @@ class Board extends Component {
   }
 
   componentWillMount() {
-    this.props.getLists(15);
+    this.props.getLists(8);
   }
 
   moveCard(dragIndexX, dragIndexY, hoverIndexX, hoverIndexY) {
@@ -31,11 +31,13 @@ class Board extends Component {
   }
 
   render() {
+    const { lists } = this.props;
+
     return (
       <div style={{ height: '100%' }}>
         <CustomDragLayer snapToGrid={false} />
-        {this.props.lists.map((item, i) =>
-          <div x={i} className="desk" key={item.id}>
+        {lists.map((item, i) =>
+          <div className="desk" key={item.id}>
             <div className="desk-head">
               <div className="desk-name">{item.name}</div>
             </div>
@@ -61,6 +63,5 @@ function mapDispatchToProps(dispatch) {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(
-  dragContext(HTML5Backend)(Board)
+  DragDropContext(HTML5Backend)(Board)
 );
-

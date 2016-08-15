@@ -3,12 +3,14 @@ import React, { PropTypes } from 'react';
 const propTypes = {
   item: PropTypes.object.isRequired,
   style: PropTypes.object,
+  y: PropTypes.number,
   isDragging: PropTypes.bool
 };
 
 const bJpg = require('../../../assets/images/b.jpg');
 const galPng = require('../../../assets/images/gal.png');
 const delPng = require('../../../assets/images/del.png');
+
 
 const Card = (props) => {
   const { style, item } = props;

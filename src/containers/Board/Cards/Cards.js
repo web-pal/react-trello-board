@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { DropTarget } from 'react-dnd';
-// import { findDOMNode } from 'react-dom';
+import { findDOMNode } from 'react-dom';
 
 import Card from './DraggableCard';
 
@@ -111,7 +111,7 @@ function collect(connect, monitor) {
   };
 }
 
-function getPlaceholderIndex(y) {
+function getPlaceholderIndex(y, scrollY) {
   let placeholderIndex;
 
   // t0d0: change cardHeight from const
@@ -122,7 +122,7 @@ function getPlaceholderIndex(y) {
   const offsetHeight = 84; // height offset from the top of the page
 
   // we start counting from the top of dragTarget
-  const yPos = y - offsetHeight;
+  const yPos = y - offsetHeight + scrollY;
 
   if (yPos < cardHeight / 2) {
     placeholderIndex = -1; // place at the start
@@ -148,12 +148,14 @@ const specs = {
     if (lastX === nextX && lastY === nextY) {
       return;
     }
-    console.log(placeholderIndex);
 
     props.moveCard(lastX, lastY, nextX, nextY);
   },
   hover(props, monitor, component) {
-    const placeholderIndex = getPlaceholderIndex(monitor.getClientOffset().y);
+    const placeholderIndex = getPlaceholderIndex(
+      monitor.getClientOffset().y,
+      findDOMNode(component).scrollTop
+    );
 
     // IMPORTANT!
     // HACK! Since there is an open bug in react-dnd, making it impossible

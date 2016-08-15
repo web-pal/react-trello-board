@@ -14,7 +14,7 @@ export function getLists(quantity) {
       let count = 0;
       for (let i = 0; i < quantity; i++) {
         const cards = [];
-        const randomQuantity = Math.floor(Math.random() * (6 - 1 + 1)) + 1;
+        const randomQuantity = Math.floor(Math.random() * (9 - 1 + 1)) + 1;
         for (let ic = 0; ic < randomQuantity; ic++) {
           cards.push({
             id: count,

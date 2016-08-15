@@ -20,7 +20,9 @@ class Cards extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      placeholderIndex: undefined
+      placeholderIndex: undefined,
+      isScrollingTop: false,
+      isScrollingBottom: false
     }; // defined at specs object
   }
 
@@ -152,10 +154,38 @@ const specs = {
     props.moveCard(lastX, lastY, nextX, nextY);
   },
   hover(props, monitor, component) {
+    const { isScrollingTop, isScrollingBottom } = component.state;
+
     const placeholderIndex = getPlaceholderIndex(
       monitor.getClientOffset().y,
       findDOMNode(component).scrollTop
     );
+
+    if (monitor.getClientOffset().y < 160) {
+      if (!isScrollingTop) {
+        component.setState({ isScrollingTop: true });
+
+        setTimeout(function scrollUp() {
+          findDOMNode(component).scrollTop -= 1;
+          if (component.state.isScrollingTop) setTimeout(scrollUp, 10);
+        }, 10);
+      }
+    } else {
+      component.setState({ isScrollingTop: false });
+    }
+
+    if (monitor.getClientOffset().y > 620) {
+      if (!isScrollingBottom) {
+        component.setState({ isScrollingBottom: true });
+
+        setTimeout(function scrollDown() {
+          findDOMNode(component).scrollTop += 1;
+          if (component.state.isScrollingBottom) setTimeout(scrollDown, 10);
+        }, 10);
+      }
+    } else {
+      component.setState({ isScrollingBottom: false });
+    }
 
     // IMPORTANT!
     // HACK! Since there is an open bug in react-dnd, making it impossible
@@ -163,9 +193,7 @@ const specs = {
     // user moves the mouse, we do this awful hack and set the state (!!)
     // on the component from here outside the component.
     // https://github.com/gaearon/react-dnd/issues/179
-    component.setState({
-      placeholderIndex
-    });
+    component.setState({ placeholderIndex });
     const item = monitor.getItem();
     document.getElementById(item.id).style.display = 'none';
 

@@ -3,13 +3,16 @@ import { Record } from 'immutable';
 import {
   GET_LISTS,
   GET_LISTS_START,
-  MOVE_CARD
+  MOVE_CARD,
+  MOVE_LIST,
+  SET_LIST_PLACEHOLDER
 } from '../actions/lists';
 
 /* eslint-disable new-cap */
 const InitialState = Record({
   isFetching: false,
-  lists: []
+  lists: [],
+  listPlaceholderIndex: undefined
 });
 /* eslint-enable new-cap */
 const initialState = new InitialState;
@@ -46,6 +49,20 @@ export default function lists(state = initialState, action) {
         ctx.set('lists', newLists);
       });
     }
+    case MOVE_LIST: {
+      const newLists = [...state.lists];
+      const { lastX, nextX } = action;
+
+      newLists.splice(nextX, 0, newLists.splice(lastX, 1)[0]);
+
+      return state.withMutations((ctx) => {
+        ctx.set('lists', newLists);
+      });
+    }
+    case SET_LIST_PLACEHOLDER:
+      return state.withMutations((ctx) => {
+        ctx.set('listPlaceholderIndex', action.placeholderIndex);
+      });
     default:
       return state;
   }

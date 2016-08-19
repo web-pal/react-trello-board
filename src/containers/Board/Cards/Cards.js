@@ -2,28 +2,196 @@ import React, { Component, PropTypes } from 'react';
 import { DropTarget } from 'react-dnd';
 import { findDOMNode } from 'react-dom';
 
+import { connect } from 'react-redux';
 import Card from './DraggableCard';
 
 
-const propTypes = {
-  connectDropTarget: PropTypes.func.isRequired,
-  moveCard: PropTypes.func.isRequired,
-  cards: PropTypes.array.isRequired, // list of cards
-  x: PropTypes.number.isRequired, // column number
-  isOver: PropTypes.bool, // is over current column?
-  item: PropTypes.object, // item that is being dragged
-  canDrop: PropTypes.bool // defines whether card is being dragged
+function getPlaceholderIndex(y, scrollY) {
+  let placeholderIndex;
+
+  // t0d0: change cardHeight from const
+  const cardHeight = 161; // height of a single card(excluding marginBottom/paddingBottom)
+  const cardMargin = 10; // height of a marginBottom+paddingBottom
+
+  // t0d0: change offsetHeight from const
+  const offsetHeight = 84; // height offset from the top of the page
+
+  // we start counting from the top of dragTarget
+  const yPos = y - offsetHeight + scrollY;
+
+  if (yPos < cardHeight / 2) {
+    placeholderIndex = -1; // place at the start
+  } else {
+    placeholderIndex = Math.floor((yPos - cardHeight / 2) / (cardHeight + cardMargin));
+  }
+
+  return placeholderIndex;
+}
+
+const specs = {
+  drop(props, monitor, component) {
+    const { placeholderIndex } = component.state;
+    const lastX = monitor.getItem().x;
+    const lastY = monitor.getItem().y;
+    const nextX = props.x;
+    const nextY = placeholderIndex + 1;
+
+    if (lastX === nextX && lastY === nextY) {
+      return;
+    }
+
+    props.moveCard(lastX, lastY, nextX, nextY);
+  },
+  hover(props, monitor, component) {
+    const {
+      isScrollingRight,
+      isScrollingLeft,
+      isScrollingTop,
+      isScrollingBottom
+    } = component.state;
+
+    const placeholderIndex = getPlaceholderIndex(
+      monitor.getClientOffset().y,
+      findDOMNode(component).scrollTop
+    );
+
+    // scroll up inside column
+    if (monitor.isOver() && monitor.getClientOffset().y < 188) {
+      if (!isScrollingTop) {
+        component.setState({ isScrollingTop: true });
+        const scrollingSpeed = 5;
+
+        setTimeout(function scrollUp() {
+          findDOMNode(component).scrollTop -= scrollingSpeed;
+          if (component.state.isScrollingTop) {
+            setTimeout(scrollUp, 10);
+          }
+        }, 10);
+      }
+    } else {
+      component.setState({ isScrollingTop: false });
+    }
+
+    // scroll down inside column
+    if (monitor.isOver() && monitor.getClientOffset().y > 633) {
+      if (!isScrollingBottom) {
+        component.setState({ isScrollingBottom: true });
+        const scrollingSpeed = 5;
+
+        setTimeout(function scrollDown() {
+          findDOMNode(component).scrollTop += scrollingSpeed;
+          if (component.state.isScrollingBottom) {
+            setTimeout(scrollDown, 10);
+          }
+        }, 10);
+      }
+    } else {
+      component.setState({ isScrollingBottom: false });
+    }
+
+    // scroll right on the page
+    if (monitor.getClientOffset().x > window.innerWidth - 160) {
+      if (!isScrollingRight) {
+        component.setState({ isScrollingRight: true });
+        const scrollingSpeed = 5;
+
+        setTimeout(function scrollRight() {
+          document.getElementsByTagName('main')[0].scrollLeft += scrollingSpeed;
+          if (component.state.isScrollingRight) {
+            setTimeout(scrollRight, 10);
+          }
+        }, 10);
+      }
+    } else {
+      component.setState({ isScrollingRight: false });
+    }
+
+    // scroll left on the page
+    if (monitor.getClientOffset().x < 160) {
+      if (!isScrollingLeft) {
+        component.setState({ isScrollingLeft: true });
+        const scrollingSpeed = 5;
+
+        setTimeout(function scrollLeft() {
+          document.getElementsByTagName('main')[0].scrollLeft -= scrollingSpeed;
+          if (component.state.isScrollingLeft) {
+            setTimeout(scrollLeft, 10);
+          }
+        }, 10);
+      }
+    } else {
+      component.setState({ isScrollingLeft: false });
+    }
+
+    // IMPORTANT!
+    // HACK! Since there is an open bug in react-dnd, making it impossible
+    // to get the current client offset through the collect function as the
+    // user moves the mouse, we do this awful hack and set the state (!!)
+    // on the component from here outside the component.
+    // https://github.com/gaearon/react-dnd/issues/179
+    component.setState({ placeholderIndex });
+
+    // when drag begins, we hide the card and only display cardDragPreview
+    const item = monitor.getItem();
+    document.getElementById(item.id).style.display = 'none';
+
+    // const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
+    // const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+    // const clientOffset = monitor.getClientOffset();
+    // const hoverClientY = clientOffset.y - hoverBoundingRect.top;
+
+    // if (lastX < hoverIndexX && hoverClientY < hoverMiddleY) {
+    //   return;
+    // }
+    // if (lastX > hoverIndexX && hoverClientY > hoverMiddleY) {
+    //   return;
+    // }
+    // if (draggedId !== props.id) {
+    //   props.moveCard(lastX, lastY, hoverIndexX, hoverIndexY);
+    // }
+  }
 };
 
 
-class Cards extends Component {
+@connect(state => ({ isDragEnded: state.scrolls.isDragEnded }))
+@DropTarget('card', specs, (connectDragSource, monitor) => ({
+  connectDropTarget: connectDragSource.dropTarget(),
+  isOver: monitor.isOver(),
+  canDrop: monitor.canDrop(),
+  item: monitor.getItem()
+}))
+export default class Cards extends Component {
+  static propTypes = {
+    connectDropTarget: PropTypes.func.isRequired,
+    moveCard: PropTypes.func.isRequired,
+    isDragEnded: PropTypes.bool,
+    cards: PropTypes.array.isRequired, // list of cards
+    x: PropTypes.number.isRequired, // column number
+    isOver: PropTypes.bool, // is over current column?
+    item: PropTypes.object, // item that is being dragged
+    canDrop: PropTypes.bool // defines whether card is being dragged
+  }
+
   constructor(props) {
     super(props);
     this.state = {
       placeholderIndex: undefined,
+      isScrollingRight: false,
+      isScrollingLeft: false,
       isScrollingTop: false,
       isScrollingBottom: false
     }; // defined at specs object
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.isDragEnded) {
+      this.setState({
+        isScrollingRight: false,
+        isScrollingLeft: false,
+        isScrollingTop: false,
+        isScrollingBottom: false
+      });
+    }
   }
 
   render() {
@@ -80,119 +248,3 @@ class Cards extends Component {
     );
   }
 }
-
-Cards.propTypes = propTypes;
-
-function collect(connect, monitor) {
-  return {
-    connectDropTarget: connect.dropTarget(),
-    isOver: monitor.isOver(),
-    canDrop: monitor.canDrop(),
-    item: monitor.getItem()
-  };
-}
-
-function getPlaceholderIndex(y, scrollY) {
-  let placeholderIndex;
-
-  // t0d0: change cardHeight from const
-  const cardHeight = 161; // height of a single card(excluding marginBottom/paddingBottom)
-  const cardMargin = 10; // height of a marginBottom+paddingBottom
-
-  // t0d0: change offsetHeight from const
-  const offsetHeight = 84; // height offset from the top of the page
-
-  // we start counting from the top of dragTarget
-  const yPos = y - offsetHeight + scrollY;
-
-  if (yPos < cardHeight / 2) {
-    placeholderIndex = -1; // place at the start
-  } else {
-    placeholderIndex = Math.floor((yPos - cardHeight / 2) / (cardHeight + cardMargin));
-  }
-
-  return placeholderIndex;
-}
-
-const specs = {
-  drop(props, monitor, component) {
-    component.setState({ isScrollingBottom: false, isScrollingTop: false });
-    const { placeholderIndex } = component.state;
-    const item = monitor.getItem();
-    const lastX = monitor.getItem().x;
-    const lastY = monitor.getItem().y;
-    const nextX = props.x;
-    const nextY = placeholderIndex + 1;
-
-    document.getElementById(item.id).style.display = 'block';
-
-    if (lastX === nextX && lastY === nextY) {
-      return;
-    }
-
-    props.moveCard(lastX, lastY, nextX, nextY);
-  },
-  hover(props, monitor, component) {
-    const { isScrollingTop, isScrollingBottom } = component.state;
-
-    const placeholderIndex = getPlaceholderIndex(
-      monitor.getClientOffset().y,
-      findDOMNode(component).scrollTop
-    );
-
-    if (monitor.isOver() && monitor.getClientOffset().y < 188) {
-      if (!isScrollingTop) {
-        component.setState({ isScrollingTop: true });
-        const scrollingSpeed = 5;
-
-        setTimeout(function scrollUp() {
-          findDOMNode(component).scrollTop -= scrollingSpeed;
-          if (component.state.isScrollingTop) setTimeout(scrollUp, 10);
-        }, 10);
-      }
-    } else {
-      component.setState({ isScrollingTop: false });
-    }
-
-    if (monitor.isOver() && monitor.getClientOffset().y > 633) {
-      if (!isScrollingBottom) {
-        component.setState({ isScrollingBottom: true });
-        const scrollingSpeed = 5;
-
-        setTimeout(function scrollDown() {
-          findDOMNode(component).scrollTop += scrollingSpeed;
-          if (component.state.isScrollingBottom) setTimeout(scrollDown, 10);
-        }, 10);
-      }
-    } else {
-      component.setState({ isScrollingBottom: false });
-    }
-
-    // IMPORTANT!
-    // HACK! Since there is an open bug in react-dnd, making it impossible
-    // to get the current client offset through the collect function as the
-    // user moves the mouse, we do this awful hack and set the state (!!)
-    // on the component from here outside the component.
-    // https://github.com/gaearon/react-dnd/issues/179
-    component.setState({ placeholderIndex });
-    const item = monitor.getItem();
-    document.getElementById(item.id).style.display = 'none';
-
-    // const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
-    // const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-    // const clientOffset = monitor.getClientOffset();
-    // const hoverClientY = clientOffset.y - hoverBoundingRect.top;
-
-    // if (lastX < hoverIndexX && hoverClientY < hoverMiddleY) {
-    //   return;
-    // }
-    // if (lastX > hoverIndexX && hoverClientY > hoverMiddleY) {
-    //   return;
-    // }
-    // if (draggedId !== props.id) {
-    //   props.moveCard(lastX, lastY, hoverIndexX, hoverIndexY);
-    // }
-  }
-};
-
-export default DropTarget('card', specs, collect)(Cards);

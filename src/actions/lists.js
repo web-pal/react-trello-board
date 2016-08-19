@@ -2,8 +2,9 @@ import faker from 'faker';
 
 export const GET_LISTS_START = 'GET_LISTS_START';
 export const GET_LISTS = 'GET_LISTS';
-
 export const MOVE_CARD = 'MOVE_CARD';
+export const MOVE_LIST = 'MOVE_LIST';
+export const SET_LIST_PLACEHOLDER = 'SET_LIST_PLACEHOLDER';
 
 
 export function getLists(quantity) {
@@ -36,8 +37,20 @@ export function getLists(quantity) {
   };
 }
 
+export function moveList(lastX, nextX) {
+  return (dispatch) => {
+    dispatch({ type: MOVE_LIST, lastX, nextX });
+  };
+}
+
 export function moveCard(lastX, lastY, nextX, nextY) {
   return (dispatch) => {
     dispatch({ type: MOVE_CARD, lastX, lastY, nextX, nextY });
+  };
+}
+
+export function setListPlaceholder(placeholderIndex) {
+  return (dispatch) => {
+    dispatch({ type: SET_LIST_PLACEHOLDER, placeholderIndex });
   };
 }

@@ -3,17 +3,10 @@ import { findDOMNode } from 'react-dom';
 import { DragSource } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import * as scrollActions from '../../../actions/scrolls';
 import Card from './Card';
-
-
-const propTypes = {
-  item: PropTypes.object,
-  connectDragSource: PropTypes.func.isRequired,
-  connectDragPreview: PropTypes.func.isRequired,
-  isDragging: PropTypes.bool.isRequired,
-  x: PropTypes.number.isRequired,
-  y: PropTypes.number
-};
 
 
 function getStyles(isDragging) {
@@ -22,33 +15,23 @@ function getStyles(isDragging) {
   };
 }
 
-class CardComponent extends Component {
-  componentDidMount() {
-    this.props.connectDragPreview(getEmptyImage(), {
-      captureDraggingState: true
-    });
-  }
-
-  render() {
-    const { isDragging, connectDragSource, item } = this.props;
-
-    return connectDragSource(
-      <div>
-        <Card style={getStyles(isDragging)} item={item} isDragging={isDragging} />
-      </div>
-    );
-  }
-}
-
-CardComponent.propTypes = propTypes;
-
 const cardSource = {
   beginDrag(props, monitor, component) {
+    // dispatch to redux store that drag is started
+    props.endDrag(true);
     const { item, x, y } = props;
     const { id, title } = item;
     const { clientWidth, clientHeight } = findDOMNode(component);
+
     // try use getBoundingClientRect
     return { id, title, item, x, y, clientWidth, clientHeight };
+  },
+  endDrag(props, monitor) {
+    // dispatch to redux store that drag is finished
+    props.endDrag();
+
+    // on drag end we show the card again
+    document.getElementById(monitor.getItem().id).style.display = 'block';
   },
   isDragging(props, monitor) {
     const isDragging = props.item && props.item.id === monitor.getItem().id;
@@ -118,12 +101,44 @@ const OPTIONS = {
 };
 
 
-function collectDragSource(connect, monitor) {
+function collectDragSource(connectDragSource, monitor) {
   return {
-    connectDragSource: connect.dragSource(),
-    connectDragPreview: connect.dragPreview(),
+    connectDragSource: connectDragSource.dragSource(),
+    connectDragPreview: connectDragSource.dragPreview(),
     isDragging: monitor.isDragging()
   };
 }
 
-export default DragSource('card', cardSource, collectDragSource, OPTIONS)(CardComponent);
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators(scrollActions, dispatch);
+}
+
+@connect(null, mapDispatchToProps)
+@DragSource('card', cardSource, collectDragSource, OPTIONS)
+export default class CardComponent extends Component {
+  static propTypes = {
+    item: PropTypes.object,
+    connectDragSource: PropTypes.func.isRequired,
+    connectDragPreview: PropTypes.func.isRequired,
+    isDragging: PropTypes.bool.isRequired,
+    endDrag: PropTypes.func,
+    x: PropTypes.number.isRequired,
+    y: PropTypes.number
+  }
+
+  componentDidMount() {
+    this.props.connectDragPreview(getEmptyImage(), {
+      captureDraggingState: true
+    });
+  }
+
+  render() {
+    const { isDragging, connectDragSource, item } = this.props;
+
+    return connectDragSource(
+      <div>
+        <Card style={getStyles(isDragging)} item={item} />
+      </div>
+    );
+  }
+}

@@ -52,8 +52,9 @@ export default function lists(state = initialState, action) {
     case MOVE_LIST: {
       const newLists = [...state.lists];
       const { lastX, nextX } = action;
+      const t = newLists.splice(lastX, 1)[0];
 
-      newLists.splice(nextX, 0, newLists.splice(lastX, 1)[0]);
+      newLists.splice(nextX, 0, t);
 
       return state.withMutations((ctx) => {
         ctx.set('lists', newLists);

@@ -6,13 +6,12 @@ import HTML5Backend from 'react-dnd-html5-backend';
 
 import * as ListsActions from '../../actions/lists';
 
-import CardsDropTarget from './Cards/CardsDropTarget';
+import CardsContainer from './Cards/CardsContainer';
 import CustomDragLayer from './CustomDragLayer';
 
 function mapStateToProps(state) {
   return {
-    lists: state.lists.lists,
-    listPlaceholderIndex: state.lists.listPlaceholderIndex
+    lists: state.lists.lists
   };
 }
 
@@ -21,8 +20,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 const listTarget = {
-  drop() {
-  }
+  drop() {}
 };
 
 @connect(mapStateToProps, mapDispatchToProps)
@@ -35,8 +33,7 @@ export default class Board extends Component {
     getLists: PropTypes.func.isRequired,
     moveCard: PropTypes.func.isRequired,
     moveList: PropTypes.func.isRequired,
-    lists: PropTypes.array.isRequired,
-    listPlaceholderIndex: PropTypes.number
+    lists: PropTypes.array.isRequired
   }
 
   constructor(props) {
@@ -50,51 +47,40 @@ export default class Board extends Component {
     this.props.getLists(8);
   }
 
-  moveList(lastX, nextX) {
-    this.props.moveList(lastX, nextX);
-  }
-
   moveCard(lastX, lastY, nextX, nextY) {
     this.props.moveCard(lastX, lastY, nextX, nextY);
   }
 
+  moveList(listId, nextX) {
+    const { lastX } = this.findList(listId);
+    this.props.moveList(lastX, nextX);
+  }
+
   findList(id) {
     const { lists } = this.props;
-    // TODO rewrite
-    const list = lists.filter(item => item.id === id)[0];
+    const list = lists.filter(l => l.id === id)[0];
 
     return {
       list,
-      index: lists.indexOf(list)
+      lastX: lists.indexOf(list)
     };
   }
 
-
   render() {
-    const { lists, listPlaceholderIndex } = this.props;
-    let deskList = [];
-    lists.forEach((item, i) => {
-      if (listPlaceholderIndex === i) {
-        deskList.push(
-          <div key="column_placeholder" className="desk-placeholder" />
-        );
-      }
-      deskList.push(
-        <CardsDropTarget
-          key={item.id}
-          item={item}
-          moveCard={this.moveCard}
-          moveList={this.moveList}
-          findList={this.findList}
-          x={i}
-        />
-      );
-    });
-
     return (
       <div style={{ height: '100%' }}>
         <CustomDragLayer snapToGrid={false} />
-        {deskList}
+        {this.props.lists.map((item, i) =>
+          <CardsContainer
+            key={item.id}
+            id={item.id}
+            item={item}
+            moveCard={this.moveCard}
+            moveList={this.moveList}
+            findList={this.findList}
+            x={i}
+          />
+        )}
       </div>
     );
   }

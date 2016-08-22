@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react';
 import { DropTarget } from 'react-dnd';
 import { findDOMNode } from 'react-dom';
 
-import { connect } from 'react-redux';
 import Card from './DraggableCard';
 
 
@@ -43,85 +42,46 @@ const specs = {
     props.moveCard(lastX, lastY, nextX, nextY);
   },
   hover(props, monitor, component) {
-    const {
-      isScrollingRight,
-      isScrollingLeft,
-      isScrollingTop,
-      isScrollingBottom
-    } = component.state;
+    // const { isScrollingTop, isScrollingBottom } = component.state;
 
     const placeholderIndex = getPlaceholderIndex(
       monitor.getClientOffset().y,
       findDOMNode(component).scrollTop
     );
 
-    // scroll up inside column
-    if (monitor.isOver() && monitor.getClientOffset().y < 188) {
-      if (!isScrollingTop) {
-        component.setState({ isScrollingTop: true });
-        const scrollingSpeed = 5;
+    // // scroll up inside column
+    // if (monitor.isOver() && monitor.getClientOffset().y < 188) {
+    //   if (!isScrollingTop) {
+    //     component.setState({ isScrollingTop: true });
+    //     const scrollingSpeed = 5;
 
-        setTimeout(function scrollUp() {
-          findDOMNode(component).scrollTop -= scrollingSpeed;
-          if (component.state.isScrollingTop) {
-            setTimeout(scrollUp, 10);
-          }
-        }, 10);
-      }
-    } else {
-      component.setState({ isScrollingTop: false });
-    }
+    //     setTimeout(function scrollUp() {
+    //       findDOMNode(component).scrollTop -= scrollingSpeed;
+    //       if (component.state.isScrollingTop) {
+    //         setTimeout(scrollUp, 10);
+    //       }
+    //     }, 10);
+    //   }
+    // } else {
+    //   component.setState({ isScrollingTop: false });
+    // }
 
-    // scroll down inside column
-    if (monitor.isOver() && monitor.getClientOffset().y > 633) {
-      if (!isScrollingBottom) {
-        component.setState({ isScrollingBottom: true });
-        const scrollingSpeed = 5;
+    // // scroll down inside column
+    // if (monitor.isOver() && monitor.getClientOffset().y > 633) {
+    //   if (!isScrollingBottom) {
+    //     component.setState({ isScrollingBottom: true });
+    //     const scrollingSpeed = 5;
 
-        setTimeout(function scrollDown() {
-          findDOMNode(component).scrollTop += scrollingSpeed;
-          if (component.state.isScrollingBottom) {
-            setTimeout(scrollDown, 10);
-          }
-        }, 10);
-      }
-    } else {
-      component.setState({ isScrollingBottom: false });
-    }
-
-    // scroll right on the page
-    if (monitor.getClientOffset().x > window.innerWidth - 160) {
-      if (!isScrollingRight) {
-        component.setState({ isScrollingRight: true });
-        const scrollingSpeed = 5;
-
-        setTimeout(function scrollRight() {
-          document.getElementsByTagName('main')[0].scrollLeft += scrollingSpeed;
-          if (component.state.isScrollingRight) {
-            setTimeout(scrollRight, 10);
-          }
-        }, 10);
-      }
-    } else {
-      component.setState({ isScrollingRight: false });
-    }
-
-    // scroll left on the page
-    if (monitor.getClientOffset().x < 160) {
-      if (!isScrollingLeft) {
-        component.setState({ isScrollingLeft: true });
-        const scrollingSpeed = 5;
-
-        setTimeout(function scrollLeft() {
-          document.getElementsByTagName('main')[0].scrollLeft -= scrollingSpeed;
-          if (component.state.isScrollingLeft) {
-            setTimeout(scrollLeft, 10);
-          }
-        }, 10);
-      }
-    } else {
-      component.setState({ isScrollingLeft: false });
-    }
+    //     setTimeout(function scrollDown() {
+    //       findDOMNode(component).scrollTop += scrollingSpeed;
+    //       if (component.state.isScrollingBottom) {
+    //         setTimeout(scrollDown, 10);
+    //       }
+    //     }, 10);
+    //   }
+    // } else {
+    //   component.setState({ isScrollingBottom: false });
+    // }
 
     // IMPORTANT!
     // HACK! Since there is an open bug in react-dnd, making it impossible
@@ -134,26 +94,10 @@ const specs = {
     // when drag begins, we hide the card and only display cardDragPreview
     const item = monitor.getItem();
     document.getElementById(item.id).style.display = 'none';
-
-    // const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
-    // const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-    // const clientOffset = monitor.getClientOffset();
-    // const hoverClientY = clientOffset.y - hoverBoundingRect.top;
-
-    // if (lastX < hoverIndexX && hoverClientY < hoverMiddleY) {
-    //   return;
-    // }
-    // if (lastX > hoverIndexX && hoverClientY > hoverMiddleY) {
-    //   return;
-    // }
-    // if (draggedId !== props.id) {
-    //   props.moveCard(lastX, lastY, hoverIndexX, hoverIndexY);
-    // }
   }
 };
 
 
-@connect(state => ({ isDragEnded: state.scrolls.isDragEnded }))
 @DropTarget('card', specs, (connectDragSource, monitor) => ({
   connectDropTarget: connectDragSource.dropTarget(),
   isOver: monitor.isOver(),
@@ -164,38 +108,24 @@ export default class Cards extends Component {
   static propTypes = {
     connectDropTarget: PropTypes.func.isRequired,
     moveCard: PropTypes.func.isRequired,
-    isDragEnded: PropTypes.bool,
-    cards: PropTypes.array.isRequired, // list of cards
-    x: PropTypes.number.isRequired, // column number
-    isOver: PropTypes.bool, // is over current column?
-    item: PropTypes.object, // item that is being dragged
-    canDrop: PropTypes.bool // defines whether card is being dragged
+    toggleDragging: PropTypes.func,
+    cards: PropTypes.array.isRequired,
+    x: PropTypes.number.isRequired,
+    isOver: PropTypes.bool,
+    item: PropTypes.object,
+    canDrop: PropTypes.bool
   }
 
   constructor(props) {
     super(props);
     this.state = {
       placeholderIndex: undefined,
-      isScrollingRight: false,
-      isScrollingLeft: false,
-      isScrollingTop: false,
-      isScrollingBottom: false
-    }; // defined at specs object
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.isDragEnded) {
-      this.setState({
-        isScrollingRight: false,
-        isScrollingLeft: false,
-        isScrollingTop: false,
-        isScrollingBottom: false
-      });
-    }
+      isScrolling: false,
+    };
   }
 
   render() {
-    const { connectDropTarget, x, cards, isOver, canDrop } = this.props;
+    const { connectDropTarget, x, cards, isOver, canDrop, toggleDragging } = this.props;
     const { placeholderIndex } = this.state;
 
     let toPlaceFirst;
@@ -212,6 +142,7 @@ export default class Cards extends Component {
           <Card x={x} y={i}
             item={item}
             key={item.id}
+            toggleDragging={toggleDragging}
           />
         );
       }

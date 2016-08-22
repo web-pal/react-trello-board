@@ -4,8 +4,7 @@ export const GET_LISTS_START = 'GET_LISTS_START';
 export const GET_LISTS = 'GET_LISTS';
 export const MOVE_CARD = 'MOVE_CARD';
 export const MOVE_LIST = 'MOVE_LIST';
-export const SET_LIST_PLACEHOLDER = 'SET_LIST_PLACEHOLDER';
-
+export const TOGGLE_DRAGGING = 'TOGGLE_DRAGGING';
 
 export function getLists(quantity) {
   return dispatch => {
@@ -49,8 +48,8 @@ export function moveCard(lastX, lastY, nextX, nextY) {
   };
 }
 
-export function setListPlaceholder(placeholderIndex) {
+export function toggleDragging(isDragging) {
   return (dispatch) => {
-    dispatch({ type: SET_LIST_PLACEHOLDER, placeholderIndex });
+    dispatch({ type: TOGGLE_DRAGGING, isDragging });
   };
 }

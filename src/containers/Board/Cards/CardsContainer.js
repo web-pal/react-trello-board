@@ -5,10 +5,14 @@ import Cards from './Cards';
 
 const listSource = {
   beginDrag(props) {
+    props.toggleDragging(true);
     return {
       id: props.id,
       x: props.x
     };
+  },
+  endDrag(props) {
+    props.toggleDragging(false);
   }
 };
 
@@ -16,43 +20,9 @@ const listTarget = {
   canDrop() {
     return false;
   },
-  hover(props, monitor, component) {
+  hover(props, monitor) {
     const { id: listId } = monitor.getItem();
     const { id: nextX } = props;
-    const { isScrollingRight, isScrollingLeft } = component.state;
-
-    if (monitor.getClientOffset().x > window.innerWidth - 160) {
-      if (!isScrollingRight) {
-        component.setState({ isScrollingRight: true });
-        const scrollingSpeed = 5;
-
-        setTimeout(function scrollRight() {
-          document.getElementsByTagName('main')[0].scrollLeft += scrollingSpeed;
-          if (component.state.isScrollingRight) {
-            setTimeout(scrollRight, 10);
-          }
-        }, 10);
-      }
-    } else {
-      component.setState({ isScrollingRight: false });
-    }
-
-    if (monitor.getClientOffset().x < 160) {
-      if (!isScrollingLeft) {
-        component.setState({ isScrollingLeft: true });
-        const scrollingSpeed = 5;
-
-        setTimeout(function scrollLeft() {
-          document.getElementsByTagName('main')[0].scrollLeft -= scrollingSpeed;
-          if (component.state.isScrollingLeft) {
-            setTimeout(scrollLeft, 10);
-          }
-        }, 10);
-      }
-    } else {
-      component.setState({ isScrollingLeft: false });
-    }
-
     if (listId !== nextX) {
       props.moveList(listId, props.x);
     }
@@ -75,29 +45,13 @@ export default class CardsContainer extends Component {
     moveCard: PropTypes.func.isRequired,
     moveList: PropTypes.func.isRequired,
     isDragging: PropTypes.bool,
-    findList: PropTypes.func
+    findList: PropTypes.func,
+    toggleDragging: PropTypes.func
   }
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      isScrollingRight: false,
-      isScrollingLeft: false
-    };
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.isDragEnded) {
-      this.setState({
-        isScrollingRight: false,
-        isScrollingLeft: false
-      });
-    }
-  }
-
 
   render() {
-    const { connectDropTarget, connectDragSource, item, x, moveCard, isDragging } = this.props;
+    const { connectDropTarget, connectDragSource, item, x,
+      moveCard, isDragging, toggleDragging } = this.props;
     const opacity = isDragging ? 0.5 : 1;
 
     return connectDragSource(connectDropTarget(
@@ -105,7 +59,7 @@ export default class CardsContainer extends Component {
         <div className="desk-head">
           <div className="desk-name">{item.name}</div>
         </div>
-        <Cards moveCard={moveCard} x={x} cards={item.cards} />
+        <Cards toggleDragging={toggleDragging} moveCard={moveCard} x={x} cards={item.cards} />
       </div>
     ));
   }

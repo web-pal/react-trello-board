@@ -5,14 +5,14 @@ import {
   GET_LISTS_START,
   MOVE_CARD,
   MOVE_LIST,
-  SET_LIST_PLACEHOLDER
+  TOGGLE_DRAGGING
 } from '../actions/lists';
 
 /* eslint-disable new-cap */
 const InitialState = Record({
   isFetching: false,
   lists: [],
-  listPlaceholderIndex: undefined
+  isDragging: false
 });
 /* eslint-enable new-cap */
 const initialState = new InitialState;
@@ -60,10 +60,9 @@ export default function lists(state = initialState, action) {
         ctx.set('lists', newLists);
       });
     }
-    case SET_LIST_PLACEHOLDER:
-      return state.withMutations((ctx) => {
-        ctx.set('listPlaceholderIndex', action.placeholderIndex);
-      });
+    case TOGGLE_DRAGGING: {
+      return state.set('isDragging', action.isDragging);
+    }
     default:
       return state;
   }

@@ -49,6 +49,20 @@ const specs = {
       findDOMNode(component).scrollTop
     );
 
+    if (!props.isScrolling) {
+      if (window.innerWidth - monitor.getClientOffset().x < 200) {
+        props.startScrolling('toRight');
+      } else if (monitor.getClientOffset().x < 200) {
+        props.startScrolling('toLeft');
+      }
+    } else {
+      if (window.innerWidth - monitor.getClientOffset().x > 200 &&
+          monitor.getClientOffset().x > 200
+      ) {
+        props.stopScrolling();
+      }
+    }
+
     // // scroll up inside column
     // if (monitor.isOver() && monitor.getClientOffset().y < 188) {
     //   if (!isScrollingTop) {
@@ -108,12 +122,14 @@ export default class Cards extends Component {
   static propTypes = {
     connectDropTarget: PropTypes.func.isRequired,
     moveCard: PropTypes.func.isRequired,
-    toggleDragging: PropTypes.func,
     cards: PropTypes.array.isRequired,
     x: PropTypes.number.isRequired,
     isOver: PropTypes.bool,
     item: PropTypes.object,
-    canDrop: PropTypes.bool
+    canDrop: PropTypes.bool,
+    startScrolling: PropTypes.func,
+    stopScrolling: PropTypes.func,
+    isScrolling: PropTypes.bool
   }
 
   constructor(props) {
@@ -125,11 +141,10 @@ export default class Cards extends Component {
   }
 
   render() {
-    const { connectDropTarget, x, cards, isOver, canDrop, toggleDragging } = this.props;
+    const { connectDropTarget, x, cards, isOver, canDrop } = this.props;
     const { placeholderIndex } = this.state;
 
     let toPlaceFirst;
-    let toPlaceLast;
     let cardList = [];
     cards.forEach((item, i) => {
       toPlaceFirst = false;
@@ -142,30 +157,14 @@ export default class Cards extends Component {
           <Card x={x} y={i}
             item={item}
             key={item.id}
-            toggleDragging={toggleDragging}
           />
         );
       }
 
-      if (isOver && canDrop) {
-        toPlaceLast = false;
-        // if is over current column and being dragged
-        // we check if PLACEHOLDER_INDEX is greater than lenght of the array with cards
-        // if it is greater, then we change "toPlaceLast" to true and..
-        // ..render placeholder as the last element in the column
-        // otherwise render it before element with PLACEHOLDER_INDEX
-        if (!toPlaceFirst && placeholderIndex > i) {
-          toPlaceLast = true;
-        } else if (!toPlaceFirst && !toPlaceLast && placeholderIndex === i) {
-          cardList.push(<div key="placeholder" className="item placeholder" />);
-        }
+      if (isOver && canDrop && !toPlaceFirst && placeholderIndex === i) {
+        cardList.push(<div key="placeholder" className="item placeholder" />);
       }
     });
-
-    // if placeholder index is greater than array.lenght, display placeholder as last
-    if (toPlaceLast) {
-      cardList.push(<div key="placeholder" className="item placeholder" />);
-    }
 
     // if there is no items in cards currently, display a placeholder anyway
     if (isOver && canDrop && cards.length === 0) {

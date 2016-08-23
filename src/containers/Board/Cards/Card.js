@@ -2,8 +2,7 @@ import React, { PropTypes } from 'react';
 
 const propTypes = {
   item: PropTypes.object.isRequired,
-  style: PropTypes.object,
-  y: PropTypes.number
+  style: PropTypes.object
 };
 
 const bJpg = require('../../../assets/images/b.jpg');

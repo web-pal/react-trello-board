@@ -5,14 +5,13 @@ import Cards from './Cards';
 
 const listSource = {
   beginDrag(props) {
-    props.toggleDragging(true);
     return {
       id: props.id,
       x: props.x
     };
   },
   endDrag(props) {
-    props.toggleDragging(false);
+    props.stopScrolling();
   }
 };
 
@@ -21,6 +20,19 @@ const listTarget = {
     return false;
   },
   hover(props, monitor) {
+    if (!props.isScrolling) {
+      if (window.innerWidth - monitor.getClientOffset().x < 200) {
+        props.startScrolling('toRight');
+      } else if (monitor.getClientOffset().x < 200) {
+        props.startScrolling('toLeft');
+      }
+    } else {
+      if (window.innerWidth - monitor.getClientOffset().x > 200 &&
+          monitor.getClientOffset().x > 200
+      ) {
+        props.stopScrolling();
+      }
+    }
     const { id: listId } = monitor.getItem();
     const { id: nextX } = props;
     if (listId !== nextX) {
@@ -45,13 +57,13 @@ export default class CardsContainer extends Component {
     moveCard: PropTypes.func.isRequired,
     moveList: PropTypes.func.isRequired,
     isDragging: PropTypes.bool,
-    findList: PropTypes.func,
-    toggleDragging: PropTypes.func
+    startScrolling: PropTypes.func,
+    stopScrolling: PropTypes.func,
+    isScrolling: PropTypes.bool
   }
 
   render() {
-    const { connectDropTarget, connectDragSource, item, x,
-      moveCard, isDragging, toggleDragging } = this.props;
+    const { connectDropTarget, connectDragSource, item, x, moveCard, isDragging } = this.props;
     const opacity = isDragging ? 0.5 : 1;
 
     return connectDragSource(connectDropTarget(
@@ -59,7 +71,14 @@ export default class CardsContainer extends Component {
         <div className="desk-head">
           <div className="desk-name">{item.name}</div>
         </div>
-        <Cards toggleDragging={toggleDragging} moveCard={moveCard} x={x} cards={item.cards} />
+        <Cards
+          moveCard={moveCard}
+          x={x}
+          cards={item.cards}
+          startScrolling={this.props.startScrolling}
+          stopScrolling={this.props.stopScrolling}
+          isScrolling={this.props.isScrolling}
+        />
       </div>
     ));
   }

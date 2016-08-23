@@ -15,7 +15,6 @@ function getStyles(isDragging) {
 const cardSource = {
   beginDrag(props, monitor, component) {
     // dispatch to redux store that drag is started
-    props.toggleDragging(true);
     const { item, x, y } = props;
     const { id, title } = item;
     const { clientWidth, clientHeight } = findDOMNode(component);
@@ -24,7 +23,6 @@ const cardSource = {
   },
   endDrag(props, monitor) {
     // dispatch to redux store that drag is finished
-    props.toggleDragging(false);
 
     // on drag end we show the card again
     document.getElementById(monitor.getItem().id).style.display = 'block';
@@ -63,7 +61,6 @@ function collectDragSource(connectDragSource, monitor) {
 export default class CardComponent extends Component {
   static propTypes = {
     item: PropTypes.object,
-    toggleDragging: PropTypes.func,
     connectDragSource: PropTypes.func.isRequired,
     connectDragPreview: PropTypes.func.isRequired,
     isDragging: PropTypes.bool.isRequired,

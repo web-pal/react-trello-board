@@ -11,8 +11,7 @@ import CustomDragLayer from './CustomDragLayer';
 
 function mapStateToProps(state) {
   return {
-    lists: state.lists.lists,
-    isDragging: state.lists.isDragging
+    lists: state.lists.lists
   };
 }
 
@@ -27,9 +26,7 @@ export default class Board extends Component {
     getLists: PropTypes.func.isRequired,
     moveCard: PropTypes.func.isRequired,
     moveList: PropTypes.func.isRequired,
-    toggleDragging: PropTypes.func.isRequired,
     lists: PropTypes.array.isRequired,
-    isDragging: PropTypes.bool
   }
 
   constructor(props) {
@@ -46,13 +43,21 @@ export default class Board extends Component {
 
   componentWillMount() {
     this.props.getLists(10);
-    window.addEventListener('drag', this.startScrolling);
-    window.addEventListener('dragend', this.stopScrolling);
   }
 
-  componentWillUnmount() {
-    window.removeEventListener('drag', this.startScrolling);
-    window.removeEventListener('dragend', this.stopScrolling);
+  startScrolling(direction) {
+    // if (!this.state.isScrolling) {
+    switch (direction) {
+      case 'toLeft':
+        this.setState({ isScrolling: true }, this.scrollLeft());
+        break;
+      case 'toRight':
+        this.setState({ isScrolling: true }, this.scrollRight());
+        break;
+      default:
+        break;
+    }
+    // }
   }
 
   scrollRight() {
@@ -69,25 +74,8 @@ export default class Board extends Component {
     this.scrollInterval = setInterval(scroll, 10);
   }
 
-  startScrolling(e) {
-    if (e.target.draggable) {
-      if (window.innerWidth - e.clientX > 200 && e.clientX > 200) {
-        this.stopScrolling();
-      } else {
-        if (!this.state.isScrolling) {
-          if (window.innerWidth - e.clientX < 200) {
-            this.setState({ isScrolling: true }, this.scrollRight);
-          } else if (e.clientX < 200) {
-            this.setState({ isScrolling: true }, this.scrollLeft);
-          }
-        }
-      }
-    }
-  }
-
   stopScrolling() {
-    clearInterval(this.scrollInterval);
-    this.setState({ isScrolling: false });
+    this.setState({ isScrolling: false }, clearInterval(this.scrollInterval));
   }
 
   moveCard(lastX, lastY, nextX, nextY) {
@@ -110,7 +98,7 @@ export default class Board extends Component {
   }
 
   render() {
-    const { lists, toggleDragging } = this.props;
+    const { lists } = this.props;
 
     return (
       <div style={{ height: '100%' }}>
@@ -122,8 +110,9 @@ export default class Board extends Component {
             item={item}
             moveCard={this.moveCard}
             moveList={this.moveList}
-            findList={this.findList}
-            toggleDragging={toggleDragging}
+            startScrolling={this.startScrolling}
+            stopScrolling={this.stopScrolling}
+            isScrolling={this.state.isScrolling}
             x={i}
           />
         )}

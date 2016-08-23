@@ -1,6 +1,5 @@
 import { createStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
-import promiseMiddleware from 'redux-promise-middleware';
 import { routerMiddleware } from 'react-router-redux';
 import { browserHistory } from 'react-router';
 
@@ -10,7 +9,6 @@ const reduxRouterMiddleware = routerMiddleware(browserHistory);
 const middleware = [
   reduxRouterMiddleware,
   thunk,
-  promiseMiddleware(),
 ].filter(Boolean);
 
 

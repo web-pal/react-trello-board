@@ -29,13 +29,14 @@ function getPlaceholderIndex(y, scrollY) {
 
 const specs = {
   drop(props, monitor, component) {
+    document.getElementById(monitor.getItem().id).style.display = 'block';
     const { placeholderIndex } = component.state;
     const lastX = monitor.getItem().x;
     const lastY = monitor.getItem().y;
     const nextX = props.x;
-    const nextY = placeholderIndex + 1;
+    const nextY = (lastX === nextX) ? placeholderIndex : placeholderIndex + 1;
 
-    if (lastX === nextX && lastY === nextY) {
+    if ((lastX === nextX && lastY === nextY) || nextY === -1) {
       return;
     }
 
@@ -47,6 +48,7 @@ const specs = {
       monitor.getClientOffset().y,
       findDOMNode(component).scrollTop
     );
+    console.log(placeholderIndex);
 
     // horizontal scroll
     if (!props.isScrolling) {
@@ -139,11 +141,25 @@ export default class Cards extends Component {
     };
   }
 
+  // shouldComponentUpdate(nextProps, nextState) {
+  //   console.log('this and next props');
+  //   console.log(this.props);
+  //   console.log(nextProps);
+  //   console.log('this and next state');
+  //   console.log(this.state);
+  //   console.log(nextState);
+  //   if (nextProps.canDrop === false && nextState.placeholderIndex === undefined) {
+  //     return false;
+  //   }
+  //   return true;
+  // }
+
   render() {
     const { connectDropTarget, x, cards, isOver, canDrop } = this.props;
     const { placeholderIndex } = this.state;
 
     let toPlaceFirst;
+    let toPlaceLast;
     let cardList = [];
     cards.forEach((item, i) => {
       toPlaceFirst = false;
@@ -161,10 +177,20 @@ export default class Cards extends Component {
         );
       }
 
-      if (isOver && canDrop && !toPlaceFirst && placeholderIndex === i) {
-        cardList.push(<div key="placeholder" className="item placeholder" />);
+      if (isOver && canDrop) {
+        toPlaceLast = false;
+        if (!toPlaceFirst && placeholderIndex > i) {
+          toPlaceLast = true;
+        } else if (!toPlaceFirst && !toPlaceLast && placeholderIndex === i) {
+          cardList.push(<div key="placeholder" className="item placeholder" />);
+        }
       }
     });
+
+    // if placeholder index is greater than array.lenght, display placeholder as last
+    if (toPlaceLast) {
+      cardList.push(<div key="placeholder" className="item placeholder" />);
+    }
 
     // if there is no items in cards currently, display a placeholder anyway
     if (isOver && canDrop && cards.length === 0) {

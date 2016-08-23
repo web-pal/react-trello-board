@@ -22,10 +22,8 @@ const cardSource = {
     return { id, title, item, x, y, clientWidth, clientHeight };
   },
   endDrag(props, monitor) {
-    props.stopScrolling();
-
-    // on drag end we show the card again
     document.getElementById(monitor.getItem().id).style.display = 'block';
+    props.stopScrolling();
   },
   isDragging(props, monitor) {
     const isDragging = props.item && props.item.id === monitor.getItem().id;

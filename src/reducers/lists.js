@@ -31,13 +31,6 @@ export default function lists(state = initialState, action) {
       const newLists = [...state.lists];
       const { lastX, lastY, nextX, nextY } = action;
       if (lastX === nextX) {
-        // if (newIndex >= arr.length) {
-        //   // place card at the end of the arr
-        //   let k = newIndex - arr.length;
-        //   while ((k--) + 1) {
-        //     arr.push(undefined);
-        //   }
-        // }
         newLists[lastX].cards.splice(nextY, 0, newLists[lastX].cards.splice(lastY, 1)[0]);
       } else {
         // move element to new place

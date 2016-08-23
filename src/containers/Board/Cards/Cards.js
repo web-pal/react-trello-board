@@ -34,14 +34,16 @@ const specs = {
     const lastX = monitor.getItem().x;
     const lastY = monitor.getItem().y;
     const nextX = props.x;
-    const nextY = (lastX === nextX) ? placeholderIndex : placeholderIndex + 1;
-    console.log(lastY);
-    console.log('last up, next dodwn');
-    console.log(nextY);
+    let nextY = (lastX === nextX) ? placeholderIndex : placeholderIndex + 1;
 
-    // if ((lastX === nextX && lastY === nextY) || nextY === -1) {
-    //   return;
-    // }
+    // if dragging to top
+    if (lastX === nextX && lastY - nextY > 1) {
+      nextY = nextY + 1;
+      if (lastY - nextY === 1) {
+        props.moveCard(lastX, lastY, nextX, nextY);
+        return;
+      }
+    }
 
     if ((lastX === nextX && lastY === nextY) ||
     (lastX === nextX && nextY + 1 === lastY) || nextY === -1) {
@@ -72,39 +74,6 @@ const specs = {
         props.stopScrolling();
       }
     }
-
-    // vertical scroll
-    // if (monitor.isOver() && monitor.getClientOffset().y < 188) {
-    //   if (!isScrollingTop) {
-    //     component.setState({ isScrollingTop: true });
-    //     const scrollingSpeed = 5;
-
-    //     setTimeout(function scrollUp() {
-    //       findDOMNode(component).scrollTop -= scrollingSpeed;
-    //       if (component.state.isScrollingTop) {
-    //         setTimeout(scrollUp, 10);
-    //       }
-    //     }, 10);
-    //   }
-    // } else {
-    //   component.setState({ isScrollingTop: false });
-    // }
-
-    // if (monitor.isOver() && monitor.getClientOffset().y > 633) {
-    //   if (!isScrollingBottom) {
-    //     component.setState({ isScrollingBottom: true });
-    //     const scrollingSpeed = 5;
-
-    //     setTimeout(function scrollDown() {
-    //       findDOMNode(component).scrollTop += scrollingSpeed;
-    //       if (component.state.isScrollingBottom) {
-    //         setTimeout(scrollDown, 10);
-    //       }
-    //     }, 10);
-    //   }
-    // } else {
-    //   component.setState({ isScrollingBottom: false });
-    // }
 
     // IMPORTANT!
     // HACK! Since there is an open bug in react-dnd, making it impossible
@@ -148,19 +117,6 @@ export default class Cards extends Component {
       isScrolling: false,
     };
   }
-
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   console.log('this and next props');
-  //   console.log(this.props);
-  //   console.log(nextProps);
-  //   console.log('this and next state');
-  //   console.log(this.state);
-  //   console.log(nextState);
-  //   if (nextProps.canDrop === false && nextState.placeholderIndex === undefined) {
-  //     return false;
-  //   }
-  //   return true;
-  // }
 
   render() {
     const { connectDropTarget, x, cards, isOver, canDrop } = this.props;

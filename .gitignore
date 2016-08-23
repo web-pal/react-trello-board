@@ -34,3 +34,5 @@ dist
 
 # Mac files
 .DS_Store
+
+webpack.config.production.babel.js

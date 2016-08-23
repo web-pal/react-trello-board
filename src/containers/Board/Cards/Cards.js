@@ -42,13 +42,13 @@ const specs = {
     props.moveCard(lastX, lastY, nextX, nextY);
   },
   hover(props, monitor, component) {
-    // const { isScrollingTop, isScrollingBottom } = component.state;
-
+    // defines where placeholder is rendered
     const placeholderIndex = getPlaceholderIndex(
       monitor.getClientOffset().y,
       findDOMNode(component).scrollTop
     );
 
+    // horizontal scroll
     if (!props.isScrolling) {
       if (window.innerWidth - monitor.getClientOffset().x < 200) {
         props.startScrolling('toRight');
@@ -63,7 +63,7 @@ const specs = {
       }
     }
 
-    // // scroll up inside column
+    // vertical scroll
     // if (monitor.isOver() && monitor.getClientOffset().y < 188) {
     //   if (!isScrollingTop) {
     //     component.setState({ isScrollingTop: true });
@@ -80,7 +80,6 @@ const specs = {
     //   component.setState({ isScrollingTop: false });
     // }
 
-    // // scroll down inside column
     // if (monitor.isOver() && monitor.getClientOffset().y > 633) {
     //   if (!isScrollingBottom) {
     //     component.setState({ isScrollingBottom: true });
@@ -157,6 +156,7 @@ export default class Cards extends Component {
           <Card x={x} y={i}
             item={item}
             key={item.id}
+            stopScrolling={this.props.stopScrolling}
           />
         );
       }

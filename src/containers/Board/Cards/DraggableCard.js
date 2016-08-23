@@ -22,7 +22,7 @@ const cardSource = {
     return { id, title, item, x, y, clientWidth, clientHeight };
   },
   endDrag(props, monitor) {
-    // dispatch to redux store that drag is finished
+    props.stopScrolling();
 
     // on drag end we show the card again
     document.getElementById(monitor.getItem().id).style.display = 'block';
@@ -65,7 +65,8 @@ export default class CardComponent extends Component {
     connectDragPreview: PropTypes.func.isRequired,
     isDragging: PropTypes.bool.isRequired,
     x: PropTypes.number.isRequired,
-    y: PropTypes.number
+    y: PropTypes.number,
+    stopScrolling: PropTypes.func
   }
 
   componentDidMount() {

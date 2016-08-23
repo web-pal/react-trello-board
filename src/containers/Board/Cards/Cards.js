@@ -187,7 +187,7 @@ export default class Cards extends Component {
       }
     });
 
-    // if placeholder index is greater than array.lenght, display placeholder as last
+    // if placeholder index is greater than array.length, display placeholder as last
     if (toPlaceLast) {
       cardList.push(<div key="placeholder" className="item placeholder" />);
     }

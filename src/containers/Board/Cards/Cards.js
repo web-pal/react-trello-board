@@ -35,8 +35,16 @@ const specs = {
     const lastY = monitor.getItem().y;
     const nextX = props.x;
     const nextY = (lastX === nextX) ? placeholderIndex : placeholderIndex + 1;
+    console.log(lastY);
+    console.log('last up, next dodwn');
+    console.log(nextY);
 
-    if ((lastX === nextX && lastY === nextY) || nextY === -1) {
+    // if ((lastX === nextX && lastY === nextY) || nextY === -1) {
+    //   return;
+    // }
+
+    if ((lastX === nextX && lastY === nextY) ||
+    (lastX === nextX && nextY + 1 === lastY) || nextY === -1) {
       return;
     }
 
@@ -48,7 +56,7 @@ const specs = {
       monitor.getClientOffset().y,
       findDOMNode(component).scrollTop
     );
-    console.log(placeholderIndex);
+    // console.log(placeholderIndex);
 
     // horizontal scroll
     if (!props.isScrolling) {

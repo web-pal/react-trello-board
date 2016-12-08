@@ -108,14 +108,16 @@ export default class Cards extends Component {
     const { connectDropTarget, x, cards, isOver, canDrop } = this.props;
     const { placeholderIndex } = this.state;
 
-    let toPlaceFirst;
-    let toPlaceLast;
+    let isPlaceHold = false;
     let cardList = [];
     cards.forEach((item, i) => {
-      toPlaceFirst = false;
-      if (isOver && canDrop && i === 0 && placeholderIndex === -1) {
-        toPlaceFirst = true;
-        cardList.push(<div key="placeholder" className="item placeholder" />);
+      if (isOver && canDrop) {
+        isPlaceHold = false;
+        if (i === 0 && placeholderIndex === -1) {
+          cardList.push(<div key="placeholder" className="item placeholder" />);
+        } else if (placeholderIndex > i) {
+          isPlaceHold = true;
+        }
       }
       if (item !== undefined) {
         cardList.push(
@@ -126,19 +128,13 @@ export default class Cards extends Component {
           />
         );
       }
-
-      if (isOver && canDrop) {
-        toPlaceLast = false;
-        if (!toPlaceFirst && placeholderIndex > i) {
-          toPlaceLast = true;
-        } else if (!toPlaceFirst && !toPlaceLast && placeholderIndex === i) {
-          cardList.push(<div key="placeholder" className="item placeholder" />);
-        }
+      if (isOver && canDrop && placeholderIndex === i) {
+        cardList.push(<div key="placeholder" className="item placeholder" />);
       }
     });
 
     // if placeholder index is greater than array.length, display placeholder as last
-    if (toPlaceLast) {
+    if (isPlaceHold) {
       cardList.push(<div key="placeholder" className="item placeholder" />);
     }
 

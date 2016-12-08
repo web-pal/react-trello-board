@@ -3,25 +3,19 @@ import { DropTarget } from 'react-dnd';
 import { findDOMNode } from 'react-dom';
 
 import Card from './DraggableCard';
+import { CARD_HEIGHT, CARD_MARGIN, OFFSET_HEIGHT } from '../../../constants.js';
 
 
 function getPlaceholderIndex(y, scrollY) {
   let placeholderIndex;
 
-  // t0d0: change cardHeight from const
-  const cardHeight = 161; // height of a single card(excluding marginBottom/paddingBottom)
-  const cardMargin = 10; // height of a marginBottom+paddingBottom
-
-  // t0d0: change offsetHeight from const
-  const offsetHeight = 84; // height offset from the top of the page
-
   // we start counting from the top of dragTarget
-  const yPos = y - offsetHeight + scrollY;
+  const yPos = y - OFFSET_HEIGHT + scrollY;
 
-  if (yPos < cardHeight / 2) {
+  if (yPos < CARD_HEIGHT / 2) {
     placeholderIndex = -1; // place at the start
   } else {
-    placeholderIndex = Math.floor((yPos - cardHeight / 2) / (cardHeight + cardMargin));
+    placeholderIndex = Math.floor((yPos - CARD_HEIGHT / 2) / (CARD_HEIGHT + CARD_MARGIN));
   }
 
   return placeholderIndex;

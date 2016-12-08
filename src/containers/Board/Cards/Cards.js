@@ -7,17 +7,14 @@ import { CARD_HEIGHT, CARD_MARGIN, OFFSET_HEIGHT } from '../../../constants.js';
 
 
 function getPlaceholderIndex(y, scrollY) {
-  let placeholderIndex;
-
-  // we start counting from the top of dragTarget
+  // shift placeholder if y position more than card height / 2
   const yPos = y - OFFSET_HEIGHT + scrollY;
-
+  let placeholderIndex;
   if (yPos < CARD_HEIGHT / 2) {
     placeholderIndex = -1; // place at the start
   } else {
     placeholderIndex = Math.floor((yPos - CARD_HEIGHT / 2) / (CARD_HEIGHT + CARD_MARGIN));
   }
-
   return placeholderIndex;
 }
 
@@ -28,19 +25,15 @@ const specs = {
     const lastX = monitor.getItem().x;
     const lastY = monitor.getItem().y;
     const nextX = props.x;
-    let nextY = (lastX === nextX) ? placeholderIndex : placeholderIndex + 1;
+    let nextY = placeholderIndex;
 
-    // if dragging to top
-    if (lastX === nextX && lastY - nextY > 1) {
-      nextY = nextY + 1;
-      if (lastY - nextY === 1) {
-        props.moveCard(lastX, lastY, nextX, nextY);
-        return;
-      }
+    if (lastY > nextY) { // move top
+      nextY += 1;
+    } else if (lastX !== nextX) { // insert into another list
+      nextY += 1;
     }
 
-    if ((lastX === nextX && lastY === nextY) ||
-    (lastX === nextX && nextY + 1 === lastY) || nextY === -1) {
+    if (lastX === nextX && lastY === nextY) { // if position equel
       return;
     }
 
@@ -52,7 +45,6 @@ const specs = {
       monitor.getClientOffset().y,
       findDOMNode(component).scrollTop
     );
-    // console.log(placeholderIndex);
 
     // horizontal scroll
     if (!props.isScrolling) {
